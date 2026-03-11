@@ -33,7 +33,7 @@ export default function BasicTable() {
                             <TableCell component="th" scope="row">
                                 {row.profession}
                             </TableCell>
-                            <TableCell>{row.dateRange}</TableCell>
+                            <TableCell align='right'>{row.dateRange}</TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

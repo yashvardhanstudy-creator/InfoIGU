@@ -8,7 +8,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Profile researchinterests='research' biosketch='hell' />} />
+      <Route path="/" element={<Profile researchinterests='research' biosketch='hell' honors='f' students='s' miscellaneous='sa' research='hello' />} />
       <Route path="/department" element={<Department />} />
 
       <Route path="/profile" element={<Profile researchinterests='research' />} />
