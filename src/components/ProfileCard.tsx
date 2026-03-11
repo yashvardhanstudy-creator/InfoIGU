@@ -1,3 +1,5 @@
+import * as constants from './constants'
+
 export const routes = {
   users: '/users',
   categories: '/categories',
@@ -43,15 +45,15 @@ const ProfileCard = ({ user }: ProfileCardProps) => (
           </div>
 
           <span className="text-sm text-gray-500 flex items-center gap-2">
-            <img src="https://www.svgrepo.com/show/430111/address-pin-location.svg" className="size-5" alt="Contact" />
+            <img src={constants.DEPARTMENT_SVG} className="size-5" alt="Contact" />
             <span className="font-semibold text-[#9b87f5]">{user.department}</span>
           </span>
           <span className="text-sm text-gray-500 flex items-center gap-2">
-            <img src="https://www.svgrepo.com/show/430112/mail-communication-sign.svg" className="size-5" alt="Contact" />
+            <img src={constants.EMAIL_SVG} className="size-5" alt="Contact" />
             <span className="font-semibold text-[#9b87f5]">{user.email}</span>
           </span>
           <span className="text-sm text-gray-500 flex items-center gap-2">
-            <img src="https://www.svgrepo.com/show/430122/call-contact-phone.svg" className="size-5" alt="Contact" />
+            <img src={constants.PHONE_SVG} className="size-5" alt="Contact" />
             <span className="font-semibold text-[#9b87f5]">{user.phone}</span>
           </span>
         </div>
