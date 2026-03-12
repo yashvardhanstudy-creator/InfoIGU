@@ -6,7 +6,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import * as React from "react";
-import { Input } from "@mui/material";
+import TableHead from "@mui/material/TableHead";
 
 export default function ShowProfession({
   data,
@@ -17,7 +17,6 @@ export default function ShowProfession({
   }[];
 }) {
   const [professions, setProfessions] = React.useState(data);
-  const [unSavedProfessions, setUnSavedProfessions] = React.useState(data);
   const [changed, setChanged] = React.useState(false);
   const [onEdit, setOnEdit] = React.useState(() => {
     if (professions.length > 0) {
@@ -50,13 +49,24 @@ export default function ShowProfession({
 
   const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
     const professionToSave = e.currentTarget.name;
-    const inputElement = document.querySelector(
+    const inputElementProf = document.querySelector(
       `input[name="${professionToSave}"]`,
     ) as HTMLInputElement | null;
-    if (inputElement) {
+    const inputElementDateRange = document.querySelector(
+      `input[name="${professionToSave}date"]`,
+    ) as HTMLInputElement | null;
+    if (
+      inputElementProf &&
+      inputElementDateRange &&
+      (inputElementProf.value || inputElementDateRange.value)
+    ) {
       const updatedProfessions = professions.map((prof) => {
         if (prof.profession === professionToSave) {
-          return { ...prof, profession: inputElement.value };
+          return {
+            ...prof,
+            profession: inputElementProf.value,
+            dateRange: inputElementDateRange.value,
+          };
         }
         return prof;
       });
@@ -75,12 +85,35 @@ export default function ShowProfession({
       ...prev,
       [professionToCancel]: false,
     }));
-    setUnSavedProfessions(professions);
   };
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="profession table">
         <TableBody>
+          <TableRow>
+            <TableCell>Profession</TableCell>
+            <TableCell align="right">Date Range</TableCell>
+            <TableCell align="right">
+              <Button
+                onClick={() => {
+                  if (professions.find((prof) => prof.profession === ""))
+                    return;
+                  const newProfession = {
+                    profession: "",
+                    dateRange: "",
+                  };
+                  setProfessions([newProfession, ...professions]);
+                  setOnEdit((prev) => ({
+                    ...prev,
+                    [newProfession.profession]: true,
+                  }));
+                }}
+              >
+                Add
+              </Button>
+            </TableCell>
+            <TableCell align="right"></TableCell>
+          </TableRow>
           {professions.map((row) => (
             <TableRow
               key={row.profession}
@@ -94,10 +127,22 @@ export default function ShowProfession({
                     placeholder="profession"
                     name={row.profession}
                     style={{ display: "block", marginTop: "0.5rem" }}
+                    required={true}
                   />
                 )}
               </TableCell>
-              <TableCell align="right">{row.dateRange}</TableCell>
+              <TableCell align="right">
+                {row.dateRange}
+                {onEdit[row.profession] && (
+                  <input
+                    className="border-b-2 place-self-end placeholder:place-self-end-safe focus:outline-none focus:border-blue-500"
+                    placeholder="date range"
+                    name={row.profession + "date"}
+                    style={{ display: "block", marginTop: "0.5rem" }}
+                    required={true}
+                  />
+                )}
+              </TableCell>
               {onEdit[row.profession] && (
                 <>
                   <TableCell align="right">
