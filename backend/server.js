@@ -3,7 +3,7 @@ const express = require("express");
 const { Pool } = require("pg");
 
 const app = express();
-const port = process.env.PORT || 5000; // Choose a different port from the frontend
+const port = process.env.SERVER_PORT || 5000; // Choose a different port from the frontend
 
 // PostgreSQL connection pool
 const pool = new Pool({
@@ -35,7 +35,7 @@ pool.connect((err, client, release) => {
 app.get("/", (req, res) => {
   res.send("Hello from the backend!");
 });
-app.get("/api/data", async (req, res) => {
+app.get("/api/profiles/profile:data", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM your_table_name"); // Replace with your actual table name
     res.json(result.rows);
