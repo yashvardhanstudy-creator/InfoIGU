@@ -6,7 +6,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import * as React from "react";
-import TableHead from "@mui/material/TableHead";
 
 export default function ShowProfession({
   data,

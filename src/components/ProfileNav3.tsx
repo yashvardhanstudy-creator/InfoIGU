@@ -1,5 +1,4 @@
 const ProfileNav = () => {
-  const url = window.location.href.split("#")[0];
 
   const vertical_list_nest =
     document.getElementsByClassName("one-liner-captions");
@@ -62,9 +61,11 @@ const ProfileNav = () => {
     content_click(id);
   };
 
+
   return (
     <aside className="overflow-auto w-2/5">
-      <div className="w-full p-2 text-black hide-scrollbar min-h-20 rounded-2xl">
+
+      <div className="w-full p-2 text-black hide-scrollbar min-h-20 rounded-2xl cursor-pointer">
         <div
           className="vertical-list-head ui sub-heading"
           id="researchinterestsd"

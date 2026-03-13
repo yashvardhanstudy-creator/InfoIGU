@@ -2,6 +2,7 @@ import ShowProfession from "./ShowProfession";
 import ShowData from "./ShowData";
 import * as constants from "./constants";
 import ShowResearch from "./ShowResearch";
+import ShowPublication from "./ShowPublication";
 
 const ProfileResume = (props: any) => {
   const titleStyleh2 = "text-2xl text-[#0067B3] mt-2 mb-4";
@@ -40,7 +41,7 @@ const ProfileResume = (props: any) => {
           <h3 className={titleStyleh3} id="publications">
             Publications
           </h3>
-          <ShowData />
+          <ShowPublication data={constants.publicationData} />
           <h3 className={titleStyleh3} id="patents">
             Patents
           </h3>
