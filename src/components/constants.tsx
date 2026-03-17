@@ -9,6 +9,8 @@ const DEPARTMENT_SVG =
   "https://www.svgrepo.com/show/430111/address-pin-location.svg";
 const DEPARTMENT_SVG_WHITE =
   "https://cmsredesign.channeli.in/library/assets/icons/location.svg";
+const PROFILE_PIC_URL = "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+
 
 const professionData = [
   { profession: "B.Tech in Computer Science", dateRange: "2005-2009" },
@@ -30,4 +32,5 @@ export {
   PHONE_SVG_WHITE,
   EMAIL_SVG_WHITE,
   DEPARTMENT_SVG_WHITE,
+  PROFILE_PIC_URL,
 };

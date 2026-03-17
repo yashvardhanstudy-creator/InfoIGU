@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import ProfileHero from "../components/ProfileHero";
 import ProfileNav from "../components/ProfileNav3";
 import ProfileResume from "../components/ProfileResume";
@@ -9,6 +9,7 @@ const Profile = () => {
   const { name: urlName } = useParams();
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -42,6 +43,12 @@ const Profile = () => {
 
   return (
     <>
+      <button
+        onClick={() => navigate(-1)}
+        className="fixed top-4 left-4 z-1 bg-[#1A365D] text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-800 transition-colors font-semibold flex items-center gap-2"
+      >
+        &larr; Go Back
+      </button>
       <ProfileHero data={userData} />
       <div className="MuiBox-root flex overflow-hidden h-lvh lg:m-auto sm:m-0 lg:w-4/5 sm:w-full justify-around">
         <ProfileNav />

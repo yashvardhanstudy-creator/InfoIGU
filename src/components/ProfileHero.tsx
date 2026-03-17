@@ -1,4 +1,3 @@
-import React from "react";
 import * as constants from "./constants";
 
 interface ProfileHeroProps {
@@ -8,6 +7,8 @@ interface ProfileHeroProps {
     department?: string;
     email?: string;
     phone?: string;
+    resume_data?: any;
+    profile_pic_url?: string;
   };
 }
 
@@ -20,7 +21,7 @@ const ProfileHero = ({ data }: ProfileHeroProps) => {
       <div className="w-full md:w-2/5 flex justify-center items-center">
         <img
           className="rounded-2xl shadow-2xl w-48 h-48 md:w-3/5 md:h-auto object-cover"
-          src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          src={data.profile_pic_url || constants.PROFILE_PIC_URL}
           alt="Profile Pic"
         />
       </div>
@@ -31,7 +32,7 @@ const ProfileHero = ({ data }: ProfileHeroProps) => {
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold">{data.name}</h1>
           <div className="mt-1">
-            <p className="text-lg opacity-90">{data.designation || "Assistant Professor"}</p>
+            <p className="text-lg opacity-90">{data.designation || "Unknown"}</p>
           </div>
         </div>
         <div className="flex flex-col items-center gap-2 md:items-start">
@@ -49,7 +50,7 @@ const ProfileHero = ({ data }: ProfileHeroProps) => {
               src={constants.EMAIL_SVG_WHITE}
               alt="E-Mail: "
             />
-            {data.email}
+            {data.email || `${data.name.toLowerCase().replace(/\s+/, "")}@igu.ac.in`}
           </span>
           <span className="flex items-center gap-2">
             <img
