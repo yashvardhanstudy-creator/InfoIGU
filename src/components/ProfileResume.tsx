@@ -8,7 +8,7 @@ const ProfileResume = (props: any) => {
   const titleStyleh2 = "text-2xl text-[#0067B3] mt-2 mb-4";
   const titleStyleh3 = "text-xl  mb-4";
   return (
-    <div className="w-auto bg-[#f0f0f0] p-2 text-black hide-scrollbar min-h-20  rounded-2xl overflow-y-auto ">
+    <div className="w-auto bg-[#f0f0f0] p-2 hide-scrollbar min-h-20  rounded-2xl overflow-y-auto ">
       {props.researchinterests && (
         <>
           <h2 className={titleStyleh2} id="researchinterests">
@@ -17,7 +17,6 @@ const ProfileResume = (props: any) => {
           <p>{props.researchinterests}</p>
         </>
       )}
-
       {props.biosketch && (
         <>
           <h2 className={titleStyleh2}>BIO SKETCH</h2>
