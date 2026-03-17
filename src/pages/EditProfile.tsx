@@ -18,7 +18,7 @@ const EditProfile = (props: EditProfileProps) => {
   return (
     <>
       <EditProfileHero />
-      <div className="flex overflow-hidden h-dvh w-4/5 m-auto justify-around">
+      <div className="flex overflow-hidden h-dvh lg:w-4/5 w-[95%] m-auto justify-around">
         <ProfileNav />
         <ProfileResume
           researchinterests="research"

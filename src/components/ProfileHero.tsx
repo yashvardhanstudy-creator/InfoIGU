@@ -1,11 +1,20 @@
+import React from "react";
 import * as constants from "./constants";
 
-const ProfileHero = () => {
-  const data = { name: "Pooja" };
+interface ProfileHeroProps {
+  data: {
+    name: string;
+    designation?: string;
+    department?: string;
+    email?: string;
+    phone?: string;
+  };
+}
 
+const ProfileHero = ({ data }: ProfileHeroProps) => {
   return (
     <div
-      className="flex lg:flex-col sm:flex-row sm:w-full md:flex-row w-[95%] lg:w-4/5 bg-[#1A365D] min-h-2/5 text-blue-50 mt-4 m-auto rounded-2xl p-6 md:p-10 p-10 gap-6"
+      className="flex flex-col md:flex-row w-[95%] lg:w-4/5 bg-[#1A365D] min-h-2/5 text-white m-auto rounded-2xl p-6 md:p-10 gap-6 mt-4"
       style={{ padding: "2vh 5vw" }}
     >
       <div className="w-full md:w-2/5 flex justify-center items-center">
@@ -22,17 +31,17 @@ const ProfileHero = () => {
         <div>
           <h1 className="text-3xl md:text-4xl font-extrabold">{data.name}</h1>
           <div className="mt-1">
-            <p className="text-lg opacity-90">Assistant Professor</p>
+            <p className="text-lg opacity-90">{data.designation || "Assistant Professor"}</p>
           </div>
         </div>
-        <div>
+        <div className="flex flex-col items-center gap-2 md:items-start">
           <span className="flex items-center gap-2">
             <img
               className="w-4"
               src={constants.DEPARTMENT_SVG_WHITE}
               alt="Department: "
             />
-            Department of Computer Science
+            {data.department || "Department of Computer Science"}
           </span>
           <span className="flex items-center gap-2">
             <img
@@ -40,7 +49,7 @@ const ProfileHero = () => {
               src={constants.EMAIL_SVG_WHITE}
               alt="E-Mail: "
             />
-            pooja@igu.ac.in
+            {data.email}
           </span>
           <span className="flex items-center gap-2">
             <img
@@ -48,7 +57,7 @@ const ProfileHero = () => {
               src={constants.PHONE_SVG_WHITE}
               alt="Phone: "
             />
-            +91 9876543210
+            {data.phone || "N/A"}
           </span>
         </div>
         <p className="text-[#cfdbe6] text-sm"></p>

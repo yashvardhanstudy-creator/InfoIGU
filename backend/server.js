@@ -1,21 +1,23 @@
 require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
+const cors = require("cors");
 
 const app = express();
 const port = process.env.SERVER_PORT || 5000; // Choose a different port from the frontend
 
 // PostgreSQL connection pool
 const pool = new Pool({
-  user: process.env.POSTGRES_USER || "postgres", // Replace with your PostgreSQL username
+  user: process.env.POSTGRES_USER || "postgres",
   host: process.env.HOST || "localhost",
-  database: process.env.POSTGRES_DB, // Replace with your PostgreSQL database name
-  password: process.env.POSTGRES_PASSWORD, // Replace with your PostgreSQL password
+  database: process.env.POSTGRES_DB || "test",
+  password: process.env.POSTGRES_PASSWORD || "123456789",
   port: process.env.POSTGRES_PORT || 5432,
 });
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+app.use(cors());
 
 // Test database connection
 pool.connect((err, client, release) => {
@@ -33,11 +35,49 @@ pool.connect((err, client, release) => {
 
 // Basic API endpoint
 app.get("/", (req, res) => {
-  res.send("Hello from the backend!");
+  res.json("Hello from the backend!");
 });
-app.get("/api/profiles/profile:data", async (req, res) => {
+
+// Register endpoint
+app.post("/api/register", async (req, res) => {
+  const { name, password } = req.body;
   try {
-    const result = await pool.query("SELECT * FROM your_table_name"); // Replace with your actual table name
+    const result = await pool.query(
+      "INSERT INTO users (name, password) VALUES ($1, $2) RETURNING *",
+      [name, password],
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Login endpoint
+app.post("/api/login", async (req, res) => {
+  const { name, password } = req.body;
+  try {
+    const result = await pool.query(
+      "SELECT * FROM users WHERE name = $1 AND password = $2",
+      [name, password],
+    );
+    if (result.rows.length > 0) {
+      res.json({ success: true, user: result.rows[0] });
+    } else {
+      res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.get("/api/profiles/profile/:name", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM users where name = $1", [
+      req.params.name,
+    ]);
+
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
@@ -45,8 +85,15 @@ app.get("/api/profiles/profile:data", async (req, res) => {
   }
 });
 
-app.get("/:profile", (req, res) => {
-  res.send("Hello from the backend!");
+app.get("/api/show", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM users");
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
 });
 
 // Start the server

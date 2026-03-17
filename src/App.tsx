@@ -1,16 +1,18 @@
 // import { useState } from 'react'
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router";
 import "./App.css";
 // import Departments from './pages/Departments'
 import Department from "./pages/Department";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import Auth from "./pages/Auth";
 function App() {
   return (
     <Routes>
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/profile/:name" element={<Profile />} />
+      <Route path="/" element={<Department />} />
       <Route
-        path="/"
+        path="/edit"
         element={
           <EditProfile
             researchinterests="research"
@@ -22,7 +24,8 @@ function App() {
           />
         }
       />
-      <Route path="/department" element={<Department />} />
+      <Route path="/auth" element={<Auth />} />
+
     </Routes>
   );
 }

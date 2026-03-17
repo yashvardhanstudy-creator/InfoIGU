@@ -60,15 +60,15 @@ const ProfileCard = ({ user }: ProfileCardProps) => (
       </div>
 
       {/* description */}
-      <p title={user.researchInterest} className="mb-4 line-clamp-3 text-gray-600">
-        {user.researchInterest}
+      <p title="hello" className="mb-4 line-clamp-3 text-gray-600">
+        {"lorem"}
       </p>
     </div>
 
     {/* button */}
     <div className="border-t border-t-green-100 bg-gray-50 p-4">
       <a
-        href="/profile"
+        href={"/profile/" + user.name.toLowerCase().replace(/\s+/, "")}
         className="block w-full rounded-lg bg-[#9b87f5] p-1 text-center text-white transition-all duration-300 hover:bg-purple-500"
       >
         View Profile

@@ -1,3 +1,4 @@
+import { Button } from "@mui/material"
 
 
 const Header = () => {
@@ -9,7 +10,7 @@ const Header = () => {
           <li><a href="/" className="hover:text-yellow-300">Indira Gandhi University</a></li>
         </ul>
       </nav>
-      <h1 className='text-yellow-300'>My App</h1>
+      <Button className='text-yellow-300' variant="contained" onClick={() => { window.location.href = "/auth" }}>Edit Your Profile</Button>
 
     </header>
   )

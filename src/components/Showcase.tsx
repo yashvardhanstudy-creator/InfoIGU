@@ -5,29 +5,36 @@ import ProfileCard from './ProfileCard'
 
 const Showcase = (props: any) => {
   const [Profile, setProfile] = useState([]);
-  const [Department, setDepartment] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const [Card, setCard] = useState([]); // Do Not Remove
 
   useEffect(() => {
-    // Fetching from the public folder root
-    fetch('/demo.json')
-      .then((response) => response.json())
-      .then((data) => setProfile(data))
-      .catch((error) => console.error("Error loading JSON:", error));
-  }, []);
-  useEffect(() => {
-    // Fetching from the public folder root
-    fetch('/dept.json')
-      .then((response) => response.json())
-      .then((data) => setDepartment(data))
-      .catch((error) => console.error("Error loading JSON:", error));
+    const fetchProfileData = async () => {
+
+      try {
+        setLoading(true);
+        const response = await fetch(`http://localhost:5000/api/show/`);
+        const data = await response.json();
+        if (data && data.length > 0) {
+          setProfile(data);
+        }
+      } catch (error) {
+        console.error("Error fetching profile data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
   }, []);
   console.log(Profile);
-  console.log(Department);
+  if (loading) return <div>Loading...</div>
 
   if (props.type === 'department') {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        {Department.map((dept: any) => (
+        {Card.map((dept: any) => (
           <DepartmentCard key={dept.id} department={dept} />
         ))}
       </div>
