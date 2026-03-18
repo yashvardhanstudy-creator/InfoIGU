@@ -8,7 +8,7 @@ interface ProfileData {
   department: string;
   email: string;
   phone: string;
-  // Add other editable fields here if needed
+  profile_pic_url?: string;
 }
 
 const EditProfile = () => {
@@ -18,6 +18,7 @@ const EditProfile = () => {
     department: "",
     email: "",
     phone: "",
+    profile_pic_url: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   // Simulate data fetching on component mount
@@ -31,6 +32,7 @@ const EditProfile = () => {
       department: "Computer Science Dept.",
       email: "pooja.singh@example.com",
       phone: "+91-9876543210",
+      profile_pic_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0'
     };
     fetchedDataOG.current = initialData;
     setProfileData(initialData);
@@ -48,6 +50,23 @@ const EditProfile = () => {
     setProfileData((prevData) => ({
       ...prevData,
       [name]: value,
+    }));
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // In a real app, you'd upload to a server. 
+    // Since we are saving to public/profile_picture, we simulate the path.
+    // Note: Browser security prevents JS from writing directly to the filesystem.
+    // This assumes your backend handles the actual move to the folder.
+    const fileName = `${Date.now()}-${file.name}`;
+    const filePath = `/profile_pictures/${fileName}`;
+
+    setProfileData((prev) => ({
+      ...prev,
+      profile_pic_url: filePath,
     }));
   };
 
@@ -71,12 +90,24 @@ const EditProfile = () => {
           className="flex flex-col md:flex-row w-[95%] lg:w-4/5 bg-[#1A365D] min-h-2/5 text-white m-auto rounded-b-2xl p-6 md:p-10 gap-6"
           style={{ padding: "2vh 5vw" }}
         >
-          <div className="w-full md:w-2/5 flex justify-center items-center">
+          <div className="w-full md:w-2/5 flex flex-col justify-center items-center gap-4">
             <img
               className="rounded-2xl shadow-2xl w-48 h-48 md:w-3/5 md:h-auto object-cover"
-              src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src={profileData.profile_pic_url || constants.PROFILE_PIC_URL}
               alt="Profile Pic"
             />
+            {isEditing && (
+              <div className="flex flex-col items-center">
+                <label className="text-xs mb-1 opacity-80">Upload New Photo</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="text-xs w-48 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                <p className="text-[10px] mt-1 opacity-60">Path: {profileData.profile_pic_url}</p>
+              </div>
+            )}
           </div>
           <div className="w-full md:w-3/5 flex flex-col justify-between gap-4 text-center md:text-left">
             <div>

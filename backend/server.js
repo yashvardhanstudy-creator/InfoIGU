@@ -2,9 +2,9 @@ require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
-
+const path = require("path");
 const app = express();
-const port = process.env.SERVER_PORT || 5000; // Choose a different port from the frontend
+const port = process.env.SERVER_PORT || 5000;
 
 // PostgreSQL connection pool
 const pool = new Pool({
@@ -15,11 +15,12 @@ const pool = new Pool({
   port: process.env.POSTGRES_PORT || 5432,
 });
 
-// Middleware to parse JSON bodies
 app.use(express.json());
 app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+console.log(__dirname);
+app.use("/", express.static(path.join(__dirname, "public")));
 
-// Test database connection
 pool.connect((err, client, release) => {
   if (err) {
     return console.error("Error acquiring client", err.stack);
@@ -35,7 +36,7 @@ pool.connect((err, client, release) => {
 
 // Basic API endpoint
 app.get("/", (req, res) => {
-  res.json("Hello from the backend!");
+  res.json(__dirname);
 });
 
 // Register endpoint
