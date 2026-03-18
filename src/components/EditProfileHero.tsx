@@ -4,17 +4,19 @@ import * as constants from "./constants";
 
 interface ProfileData {
   name: string;
-  profession: string;
+  designation: string;
   department: string;
   email: string;
   phone: string;
   profile_pic_url?: string;
+  oldname?: string;
+  image?: File;
 }
 
-const EditProfile = () => {
+const EditProfile = (user: any) => {
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
-    profession: "",
+    designation: "",
     department: "",
     email: "",
     phone: "",
@@ -23,19 +25,40 @@ const EditProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   // Simulate data fetching on component mount
   const fetchedDataOG = useRef<ProfileData | null>(null); // Use useRef to store initial data
+  const [imageFile, setImageFile] = useState<File>();
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+
   useEffect(() => {
-    // In a real application, you would fetch this data from an API
-    // e.g., fetch('/api/profile').then(res => res.json()).then(data => setProfileData(data));
+    console.log(user);
     const initialData: ProfileData = {
-      name: "Pooja Singh",
-      profession: "Assistant Professor",
-      department: "Computer Science Dept.",
-      email: "pooja.singh@example.com",
-      phone: "+91-9876543210",
-      profile_pic_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0'
+      name: user.user.name,
+      designation: user.user.designation,
+      department: user.user.department,
+      email: user.user.email,
+      phone: user.user.phone,
+      profile_pic_url: constants.SERVER_URL + "default.png",
     };
-    fetchedDataOG.current = initialData;
-    setProfileData(initialData);
+
+    const fetchImage = async () => {
+      try {
+        const imageUrl = constants.SERVER_URL + user.user.name + "_" + user.user.department + ".png";
+        const response = await fetch(imageUrl);
+        if (response.ok) {
+          const blob = await response.blob();
+          const file = new File([blob], `${user.user.name}_${user.user.department}.png`, { type: blob.type });
+          setImageFile(file);
+          setPreviewUrl(URL.createObjectURL(file));
+          initialData.profile_pic_url = imageUrl;
+        }
+      } catch (error) {
+        console.error("Error fetching user image:", error);
+      } finally {
+        fetchedDataOG.current = initialData;
+        setProfileData(initialData);
+      }
+    };
+
+    fetchImage();
   }, []); // Empty dependency array means this effect runs once after the initial render
 
   const handleExit = () => {
@@ -54,33 +77,50 @@ const EditProfile = () => {
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setImageFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // Create a local URL for preview
+    }
     // In a real app, you'd upload to a server. 
     // Since we are saving to public/profile_picture, we simulate the path.
     // Note: Browser security prevents JS from writing directly to the filesystem.
-    // This assumes your backend handles the actual move to the folder.
-    const fileName = `${Date.now()}-${file.name}`;
-    const filePath = `/profile_pictures/${fileName}`;
-
-    setProfileData((prev) => ({
-      ...prev,
-      profile_pic_url: filePath,
-    }));
+    // This assumes your backend handles the actual move to the folder
   };
 
-  const createJsonProfileData = (data: ProfileData) => {
-    return JSON.stringify(data, null, 2); // Pretty print JSON with 2 space indent
-  };
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     // Here you would typically send the profileData to your backend API to save changes
+
+    const formData = new FormData();
+    formData.append("name", profileData.name);
+    formData.append("designation", profileData.designation);
+    formData.append("department", profileData.department);
+    formData.append("email", profileData.email);
+    formData.append("phone", profileData.phone);
+    if (fetchedDataOG.current?.name) {
+      formData.append("oldname", fetchedDataOG.current.name);
+    }
+    if (imageFile) {
+      formData.append("image", imageFile);
+    }
+
+    fetch("http://localhost:5000/api/update", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+
     console.log("Saving changes:", profileData);
-    console.log("JSON Profile Data:", createJsonProfileData(profileData));
-    setIsEditing(false); // Exit editing mode after saving
+    setIsEditing(false);
     // You might want to add error handling or a success notification here
+
   };
 
   return (
@@ -91,10 +131,16 @@ const EditProfile = () => {
           style={{ padding: "2vh 5vw" }}
         >
           <div className="w-full md:w-2/5 flex flex-col justify-center items-center gap-4">
-            <img
+            {/* <img
               className="rounded-2xl shadow-2xl w-48 h-48 md:w-3/5 md:h-auto object-cover"
-              src={profileData.profile_pic_url || constants.PROFILE_PIC_URL}
+              src={previewUrl || profileData.profile_pic_url || constants.SERVER_URL + "default.png"}
               alt="Profile Pic"
+            /> */}
+            <img
+              src={previewUrl || `${constants.SERVER_URL}${user.name}_${user.department}.png`}
+              onError={(e) => { e.currentTarget.src = constants.PROFILE_PIC_URL; }}
+              alt={profileData.name}
+              className="size-16 md:size-24 lg:size-32 rounded-full object-cover"
             />
             {isEditing && (
               <div className="flex flex-col items-center">
@@ -127,12 +173,12 @@ const EditProfile = () => {
                   <input
                     type="text"
                     className="mb-4 text-white p-1 rounded bg-blue-400" // Added styling for clarity
-                    value={profileData.profession}
-                    name="profession"
+                    value={profileData.designation}
+                    name="designation"
                     onChange={handleChange}
                   />
                 ) : (
-                  <p className="text-lg opacity-90">{profileData.profession}</p>
+                  <p className="text-lg opacity-90">{profileData.designation}</p>
                 )}
               </div>
             </div>

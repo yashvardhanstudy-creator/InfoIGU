@@ -9,7 +9,8 @@ const DEPARTMENT_SVG =
   "https://www.svgrepo.com/show/430111/address-pin-location.svg";
 const DEPARTMENT_SVG_WHITE =
   "https://cmsredesign.channeli.in/library/assets/icons/location.svg";
-const PROFILE_PIC_URL = "http://localhost:5000/img/default.png";
+const PROFILE_PIC_URL = "http://localhost:5000/default.png";
+const SERVER_URL = "http://localhost:5000/";
 
 
 const professionData = [
@@ -33,4 +34,5 @@ export {
   EMAIL_SVG_WHITE,
   DEPARTMENT_SVG_WHITE,
   PROFILE_PIC_URL,
+  SERVER_URL,
 };

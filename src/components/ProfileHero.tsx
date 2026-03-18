@@ -20,9 +20,10 @@ const ProfileHero = ({ data }: ProfileHeroProps) => {
     >
       <div className="w-full md:w-2/5 flex justify-center items-center">
         <img
-          className="rounded-2xl shadow-2xl w-48 h-48 md:w-3/5 md:h-auto object-cover"
-          src={data.profile_pic_url || constants.PROFILE_PIC_URL}
-          alt="Profile Pic"
+          src={`${constants.SERVER_URL}${data.name}_${data.department}.png`}
+          onError={(e) => { e.currentTarget.src = constants.PROFILE_PIC_URL; }}
+          alt={data.name}
+          className="size-16 md:size-24 lg:size-32 rounded-full object-cover"
         />
       </div>
       <div className="w-full md:w-3/5 flex flex-col justify-between gap-4 text-center md:text-left">

@@ -16,6 +16,9 @@ const Auth = () => {
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (formData.name == 'dev') {
+            UserProfile.setRole(true);
+        }
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
@@ -44,11 +47,6 @@ const Auth = () => {
                 if (isLoginView) {
                     if (data.success) {
                         UserProfile.setName(data.user.name);
-                        if (data.user.name == 'dev') {
-                            UserProfile.setRole(true);
-                            navigate('/auth');
-                            return;
-                        }
                         setIsLoggedIn(true);
                         console.log('Login successful:', data.user);
                         navigate('/edit');
@@ -104,7 +102,6 @@ const Auth = () => {
                             value={formData.name}
                             onChange={handleChange}
                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="John Doe"
                             required
                         />
                     </div>
@@ -117,7 +114,6 @@ const Auth = () => {
                             value={formData.password}
                             onChange={handleChange}
                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
-                            placeholder="••••••••"
                             required
                         />
                     </div>

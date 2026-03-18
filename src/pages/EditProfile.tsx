@@ -34,13 +34,13 @@ const EditProfile = (props: EditProfileProps) => {
       try {
         const response = await fetch(`http://localhost:5000/api/profiles/profile/${name}`);
         const data = await response.json();
-        console.log(data);
         if (data && data.length > 0) {
           setUserData(data[0]);
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
       } finally {
+        console.log(userData);
         setLoading(false);
       }
     };
@@ -61,7 +61,7 @@ const EditProfile = (props: EditProfileProps) => {
       >
         &larr; Go Back
       </button>
-      <EditProfileHero />
+      <EditProfileHero user={userData} />
       <div className="flex overflow-hidden h-dvh lg:w-4/5 w-[95%] m-auto justify-around">
         <ProfileNav />
         <ProfileResume

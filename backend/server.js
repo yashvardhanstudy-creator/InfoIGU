@@ -4,6 +4,8 @@ const { Pool } = require("pg");
 const cors = require("cors");
 const path = require("path");
 const app = express();
+const multer = require("multer");
+
 const port = process.env.SERVER_PORT || 5000;
 
 // PostgreSQL connection pool
@@ -20,7 +22,23 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 console.log(__dirname);
 app.use("/", express.static(path.join(__dirname, "public")));
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, "public"));
+  },
+  filename: (req, file, cb) => {
+    // Access data from req.body
+    const userName = req.body.name || "unknown";
+    const dept = req.body.department || "general";
 
+    // Create new filename: JohnDoe_Engineering.png (Matches frontend)
+    const newFilename = `${userName}_${dept}.png`;
+
+    cb(null, newFilename);
+  },
+});
+
+const upload = multer({ storage: storage });
 pool.connect((err, client, release) => {
   if (err) {
     return console.error("Error acquiring client", err.stack);
@@ -36,7 +54,7 @@ pool.connect((err, client, release) => {
 
 // Basic API endpoint
 app.get("/", (req, res) => {
-  res.json(__dirname);
+  res.json("Hello to the Backend!");
 });
 
 // Register endpoint
@@ -90,6 +108,28 @@ app.get("/api/show", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM users");
 
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.post("/api/update", upload.single("image"), async (req, res) => {
+  try {
+    console.log(req.body);
+    const query =
+      "update users set designation = $1, department = $2, phone=$3, email=$4, name=$5 where name = $6";
+    const values = [
+      req.body.designation,
+      req.body.department,
+      req.body.phone,
+      req.body.email,
+      req.body.name,
+      req.body.oldname,
+    ];
+    const result = await pool.query(query, values);
+    console.log(result);
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);
