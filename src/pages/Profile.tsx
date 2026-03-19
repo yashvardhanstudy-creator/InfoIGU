@@ -52,14 +52,17 @@ const Profile = () => {
       <ProfileHero data={userData} />
       <div className="MuiBox-root flex overflow-hidden h-lvh lg:m-auto sm:m-0 lg:w-4/5 sm:w-full justify-around">
         <ProfileNav />
+
         <ProfileResume
-          researchinterests={resumeData.researchinterests}
-          biosketch={resumeData.biosketch}
-          honors={resumeData.honors}
-          students={resumeData.students}
-          miscellaneous={resumeData.miscellaneous}
-          research={resumeData.research}
-          teacherengagement={resumeData.teacherengagement}
+          name={urlName}
+          id={userData.id}
+          researchinterests={resumeData.researchinterests ? resumeData.researchinterests : 'sd'}
+          biosketch={resumeData.biosketch ? resumeData.biosketch : 'sd'}
+          honors={resumeData.honors ? resumeData.honors : 'sd'}
+          students={resumeData.students ? resumeData.students : 'sd'}
+          miscellaneous={resumeData.miscellaneous ? resumeData.miscellaneous : 'sd'}
+          research={resumeData.research ? resumeData.research : 'sd'}
+          teacherengagement={resumeData.teacherengagement ? resumeData.teacherengagement : 'sd'}
         />
       </div>
     </>

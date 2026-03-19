@@ -91,6 +91,34 @@ app.post("/api/login", async (req, res) => {
   }
 });
 
+app.get("/api/education/:id", async (req, res) => {
+  try {
+    console.log(req.params.id);
+    const result = await pool.query("SELECT * FROM education WHERE u_id = $1", [
+      Number(req.params.id),
+    ]);
+    console.log(result);
+    res.json(result.rows);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send(req.params.id);
+  }
+});
+
+app.post("/api/education/:id", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "INSERT INTO education (u_id, head, date_range) VALUES ($1, $2, $3) RETURNING *",
+      [req.params.id, req.body.head, req.body.date_range],
+    );
+    console.log(result);
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.get("/api/profiles/profile/:name", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM users where name = $1", [
@@ -130,6 +158,61 @@ app.post("/api/update", upload.single("image"), async (req, res) => {
     ];
     const result = await pool.query(query, values);
     console.log(result);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.delete("/api/education/:id/:head", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM education WHERE u_id = $1 AND head = $2",
+      [req.params.id, req.params.head],
+    );
+    console.log(result);
+    res.json(result.rows);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// --- Books Endpoints ---
+
+app.get("/api/books/:id", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM books WHERE u_id = $1", [
+      Number(req.params.id),
+    ]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.post("/api/books/:id", async (req, res) => {
+  try {
+    const { title, isbn, publish_date, edition, authors, url } = req.body;
+    const result = await pool.query(
+      "INSERT INTO books (u_id, title, isbn, publish_date, edition, authors, url) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+      [req.params.id, title, isbn, publish_date, edition, authors, url],
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.delete("/api/books/:id/:bookId", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM books WHERE u_id = $1 AND id = $2",
+      [req.params.id, req.params.bookId],
+    );
     res.json(result.rows);
   } catch (err) {
     console.error(err.message);

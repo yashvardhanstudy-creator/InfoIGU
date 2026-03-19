@@ -14,9 +14,9 @@ const SERVER_URL = "http://localhost:5000/";
 
 
 const professionData = [
-  { profession: "B.Tech in Computer Science", dateRange: "2005-2009" },
-  { profession: "M.Tech in Computer Science", dateRange: "2009-2011" },
-  { profession: "Ph.D. in Computer Science", dateRange: "2011-2015" },
+  { id: 1, head: "B.Tech in Computer Science", date_range: "2005-2009" },
+  { id: 2, head: "M.Tech in Computer Science", date_range: "2009-2011" },
+  { id: 3, head: "Ph.D. in Computer Science", date_range: "2011-2015" },
 ];
 const publicationData = [
   { Publication: "Paper 1: Deep Learning for Computer Vision" },

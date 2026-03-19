@@ -10,7 +10,7 @@ const Header = () => {
           <li><a href="/" className="hover:text-yellow-300">Indira Gandhi University</a></li>
         </ul>
       </nav>
-      <Button className='text-yellow-300' variant="contained" onClick={() => { window.location.href = "/auth" }}>Edit Your Profile</Button>
+      <Button className='text-yellow-300' variant="contained" onClick={() => { window.location.href = "/auth" }}>Edit Profile</Button>
 
     </header>
   )
