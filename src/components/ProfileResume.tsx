@@ -4,6 +4,7 @@ import * as constants from "./constants";
 import ShowResearch from "./ShowResearch";
 import ShowPublication from "./ShowPublication";
 import ShowBooks from "./ShowBooks";
+import ShowPatents from "./ShowPatents";
 
 const ProfileResume = (props: any) => {
   const titleStyleh2 = "text-2xl text-[#0067B3] mt-2 mb-4";
@@ -42,11 +43,11 @@ const ProfileResume = (props: any) => {
           <h3 className={titleStyleh3} id="publications">
             Publications
           </h3>
-          <ShowPublication data={constants.publicationData} />
+          <ShowPublication id={props.id} />
           <h3 className={titleStyleh3} id="patents">
             Patents
           </h3>
-          <ShowData />
+          <ShowPatents id={props.id} />
           <h3 className={titleStyleh3} id="books">
             Books
           </h3>

@@ -6,6 +6,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
 
 interface Book {
@@ -212,13 +213,17 @@ export default function ShowBooks({ id }: { id: number }) {
                             <TableRow key={rowId} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                                 <TableCell component="th" scope="row">
                                     {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
-                                        row.url ? (
-                                            <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
-                                                {row.title}
-                                            </a>
-                                        ) : (
-                                            row.title
-                                        )
+                                        <Tooltip title={row.title} placement="top-start" arrow>
+                                            <div className="max-w-50 truncate">
+                                                {row.url ? (
+                                                    <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
+                                                        {row.title}
+                                                    </a>
+                                                ) : (
+                                                    row.title
+                                                )}
+                                            </div>
+                                        </Tooltip>
                                     )}
                                 </TableCell>
                                 <TableCell>

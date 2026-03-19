@@ -16,7 +16,6 @@ export default function ShowProfession({
   id: number;
 }) {
   const [loading, setLoading] = React.useState(!!name);
-  console.log(name);
   const [professions, setProfessions] = React.useState(professionData);
   const [onEdit, setOnEdit] = React.useState(() => {
     if (professions.length > 0) {
@@ -36,7 +35,6 @@ export default function ShowProfession({
           throw new Error('Failed to fetch education data');
         }
         const fetchedData = await response.json();
-        console.log(fetchedData);
         setProfessions(fetchedData);
         if (fetchedData && fetchedData.length > 0) {
           setProfessions(fetchedData);

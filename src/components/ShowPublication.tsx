@@ -2,10 +2,12 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
 import { useTheme } from '@mui/material/styles';
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
 import { Box, IconButton, TableFooter, TablePagination } from "@mui/material";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
@@ -78,19 +80,49 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-export default function ShowPublication({
-  data,
-}: {
-  data: {
-    Publication: string;
-  }[];
-}) {
-  const [publications, setPublications] = React.useState(data);
-  const [onEdit, setOnEdit] = React.useState<{ [key: string]: boolean }>(() =>
-    Object.fromEntries(data.map((pub) => [pub.Publication, false]))
-  );
+interface Publication {
+  id: string | number;
+  title: string;
+  publish_date: string;
+  url: string;
+}
+
+export default function ShowPublication({ id }: { id: number }) {
+  const [loading, setLoading] = React.useState(!!id);
+  const [publications, setPublications] = React.useState<Publication[]>([]);
+  const [onEdit, setOnEdit] = React.useState<{ [key: string]: boolean }>({});
+  const [showURLColumn, setShowURLColumn] = React.useState(0);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  React.useEffect(() => {
+    const fetchPublications = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`http://localhost:5000/api/publications/${id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch publications data");
+        }
+        const fetchedData = await response.json();
+        if (fetchedData && fetchedData.length > 0) {
+          setPublications(fetchedData);
+          setOnEdit(
+            Object.fromEntries(
+              fetchedData.map((pub: Publication) => [pub.id.toString(), false])
+            )
+          );
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchPublications();
+    }
+  }, [id]);
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -111,128 +143,180 @@ export default function ShowPublication({
   };
 
   const handleAdd = () => {
-    if (publications.find((pub) => pub.Publication === "")) return;
-    const newPub = { Publication: "" };
+    if (publications.find((pub) => pub.title === "")) return;
+    const tempId = `temp_${Date.now()}`;
+    const newPub: Publication = {
+      id: tempId,
+      title: "",
+      publish_date: "",
+      url: "",
+    };
+    setShowURLColumn(showURLColumn + 1);
     setPublications([newPub, ...publications]);
-    setOnEdit((prev) => ({ ...prev, [newPub.Publication]: true }));
+    setOnEdit((prev) => ({ ...prev, [tempId]: true }));
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setShowURLColumn(showURLColumn + 1);
     const pubToEdit = e.currentTarget.name;
     setOnEdit((prev) => ({ ...prev, [pubToEdit]: true }));
   };
 
-  const handleSave = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const pubToSave = e.currentTarget.name;
-    const inputElement = document.querySelector(
-      `input[name="${pubToSave}"]`
-    ) as HTMLInputElement | null;
-    if (inputElement && inputElement.value) {
-      const updated = publications.map((pub) =>
-        pub.Publication === pubToSave
-          ? { ...pub, Publication: inputElement.value }
-          : pub
-      );
-      setPublications(updated);
-      setOnEdit((prev) => ({
-        ...prev,
-        [pubToSave]: false,
-        [inputElement.value]: false,
-      }));
+    const titleVal = (document.querySelector(`input[name="title_${pubToSave}"]`) as HTMLInputElement)?.value || "";
+    const dateVal = (document.querySelector(`input[name="publish_date_${pubToSave}"]`) as HTMLInputElement)?.value || "";
+    const urlVal = (document.querySelector(`input[name="url_${pubToSave}"]`) as HTMLInputElement)?.value || "";
+    setShowURLColumn(showURLColumn - 1);
+
+    if (titleVal) {
+      try {
+        if (!pubToSave.startsWith("temp_")) {
+          await fetch(`http://localhost:5000/api/publications/${id}/${pubToSave}`, {
+            method: "DELETE",
+          });
+        }
+
+        const response = await fetch(`http://localhost:5000/api/publications/${id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: titleVal,
+            publish_date: dateVal,
+            url: urlVal,
+          }),
+        });
+
+        if (response.ok) {
+          const newPub = await response.json();
+          const updatedPubs = publications.map((pub) => {
+            if (pub.id.toString() === pubToSave) {
+              return newPub;
+            }
+            return pub;
+          });
+          setPublications(updatedPubs);
+          setOnEdit((prev) => ({
+            ...prev,
+            [newPub.id.toString()]: false,
+            [pubToSave]: false,
+          }));
+          return;
+        }
+      } catch (error) {
+        console.error("Error saving publication:", error);
+      }
     }
+    setOnEdit((prev) => ({ ...prev, [pubToSave]: false }));
   };
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setShowURLColumn(showURLColumn - 1);
     const pubToCancel = e.currentTarget.name;
-    // If it's a new row (empty string), remove it
-    if (pubToCancel === "") {
-      setPublications((prev) => prev.filter((pub) => pub.Publication !== ""));
-      setOnEdit((prev) => {
-        const copy = { ...prev };
-        delete copy[pubToCancel];
-        return copy;
-      });
-    } else {
-      setOnEdit((prev) => ({ ...prev, [pubToCancel]: false }));
+    if (pubToCancel.startsWith("temp_")) {
+      setPublications(publications.filter((p) => p.id.toString() !== pubToCancel));
+    }
+    setOnEdit((prev) => ({ ...prev, [pubToCancel]: false }));
+  };
+
+  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const pubToDelete = e.currentTarget.name;
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/publications/${id}/${pubToDelete}`,
+        { method: "DELETE" }
+      );
+      if (response.ok) {
+        setPublications((prev) => prev.filter((pub) => pub.id.toString() !== pubToDelete));
+      }
+    } catch (error) {
+      console.error("Error deleting publication:", error);
     }
   };
 
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const pubToDelete = e.currentTarget.name;
-    setPublications((prev) =>
-      prev.filter((pub) => pub.Publication !== pubToDelete)
-    );
-    setOnEdit((prev) => {
-      const copy = { ...prev };
-      delete copy[pubToDelete];
-      return copy;
-    });
-  };
+  const renderInput = (name: string, placeholder: string, defaultValue: string, required = false) => (
+    <input
+      className="border-b-2 focus:outline-none focus:border-blue-500 w-full"
+      placeholder={placeholder}
+      name={name}
+      defaultValue={defaultValue}
+      style={{ display: "block", marginTop: "0.5rem" }}
+      required={required}
+    />
+  );
+
+  if (loading) {
+    return <div className="text-center p-4">Loading...</div>;
+  }
 
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="publication table">
-        <TableBody>
+      <Table sx={{ minWidth: 650 }} aria-label="publication table" size="small">
+        <TableHead>
           <TableRow>
-            <TableCell>Publication</TableCell>
+            <TableCell>Title</TableCell>
+            <TableCell>Publish Date</TableCell>
+            {showURLColumn > 0 ? <TableCell>URL</TableCell> : null}
             <TableCell align="right">
               <Button onClick={handleAdd}>Add</Button>
             </TableCell>
-            <TableCell align="right"></TableCell>
           </TableRow>
+        </TableHead>
+        <TableBody>
           {(rowsPerPage > 0
             ? publications.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : publications).map((row) => (
-              <TableRow
-                key={row.Publication}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {onEdit[row.Publication] ? (
-                    <input
-                      className="border-b-2 focus:outline-none focus:border-blue-500"
-                      placeholder="Publication"
-                      name={row.Publication}
-                      defaultValue={row.Publication}
-                      style={{ display: "block", marginTop: "0.5rem" }}
-                      required={true}
-                    />
-                  ) : (
-                    row.Publication
+            : publications).map((row) => {
+              const rowId = row.id.toString();
+              const isEditing = onEdit[rowId];
+              return (
+                <TableRow
+                  key={rowId}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
+                      <Tooltip title={row.title} placement="top-start" arrow>
+                        <div className="max-w-[200px] truncate">
+                          {row.url ? (
+                            <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
+                              {row.title}
+                            </a>
+                          ) : (
+                            row.title
+                          )}
+                        </div>
+                      </Tooltip>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {isEditing ? renderInput(`publish_date_${rowId}`, "Publish Date", row.publish_date) : row.publish_date}
+                  </TableCell>
+                  {showURLColumn > 0 && (
+                    <TableCell>
+                      {isEditing ? renderInput(`url_${rowId}`, "URL", row.url) : null}
+                    </TableCell>
                   )}
-                </TableCell>
-                {onEdit[row.Publication] ? (
-                  <>
-                    <TableCell align="right">
-                      <Button onClick={handleSave} name={row.Publication}>
-                        Save
-                      </Button>
-                    </TableCell>
-                    <TableCell align="right" width={"2px"}>
-                      <Button onClick={handleCancel} name={row.Publication}>
-                        Cancel
-                      </Button>
-                    </TableCell>
-                  </>
-                ) : (
-                  <>
-                    <TableCell align="right" width={"2px"}>
-                      <Button onClick={handleEdit} name={row.Publication}>
-                        Edit
-                      </Button>
-                    </TableCell>
-                    <TableCell align="right" width={"2px"}>
-                      <Button onClick={handleDelete} name={row.Publication}>
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </>
-                )}
-              </TableRow>
-            ))}
+                  <TableCell align="right">
+                    {isEditing ? (
+                      <div className="flex justify-end min-w-max">
+                        <Button onClick={handleSave} name={rowId}>Save</Button>
+                        <Button onClick={handleCancel} name={rowId}>Cancel</Button>
+                      </div>
+                    ) : (
+                      <div className="flex justify-end min-w-max">
+                        <Button onClick={handleEdit} name={rowId}>Edit</Button>
+                        <Button onClick={handleDelete} name={rowId}>Delete</Button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={6} />
+              <TableCell colSpan={showURLColumn > 0 ? 4 : 3} />
             </TableRow>
           )}
         </TableBody>
@@ -240,7 +324,7 @@ export default function ShowPublication({
           <TableRow>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={3}
+              colSpan={showURLColumn > 0 ? 4 : 3}
               count={publications.length}
               rowsPerPage={rowsPerPage}
               page={page}
