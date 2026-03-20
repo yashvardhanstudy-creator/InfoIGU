@@ -19,7 +19,7 @@ interface Patent {
     url: string;
 }
 
-export default function ShowPatents({ id }: { id: number }) {
+export default function ShowPatents({ id, heading, headingId, editMode }: { id: number; heading?: string; headingId?: string; editMode?: boolean; }) {
     const [loading, setLoading] = React.useState(!!id);
     const [patents, setPatents] = React.useState<Patent[]>([]);
     const [onEdit, setOnEdit] = React.useState<{ [key: string]: boolean }>({});
@@ -170,133 +170,144 @@ export default function ShowPatents({ id }: { id: number }) {
         return <div className="text-center p-4">Loading...</div>;
     }
 
+    if (patents.length === 0 && !editMode) {
+        return null;
+    }
+
     return (
-        <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="patents table" size="small">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Title</TableCell>
-                        <TableCell>Inventors</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell>App / Patent Number</TableCell>
-                        {showURLColumn > 0 ? <TableCell>URL</TableCell> : null}
-                        <TableCell align="right">
-                            <Button
-                                onClick={() => {
-                                    if (patents.find((p) => p.title === "")) return;
-                                    const tempId = `temp_${Date.now()}`;
-                                    const newPatent: Patent = {
-                                        id: tempId,
-                                        title: "",
-                                        inventors: "",
-                                        status: "filed",
-                                        patent_number: "",
-                                        application_number: "",
-                                        url: "",
-                                    };
-                                    setShowURLColumn(showURLColumn + 1);
-                                    setPatents([newPatent, ...patents]);
-                                    setOnEdit((prev) => ({ ...prev, [tempId]: true }));
-                                    setEditStatuses((prev) => ({ ...prev, [tempId]: "filed" }));
-                                }}
-                            >
-                                Add
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {patents.map((row) => {
-                        const rowId = row.id.toString();
-                        const isEditing = onEdit[rowId];
-                        const currentStatus = isEditing ? editStatuses[rowId] : row.status?.toLowerCase();
-
-                        const showApplicationNumber = currentStatus === 'filed' || currentStatus === 'filled' || currentStatus === 'published';
-                        const showPatentNumber = currentStatus === 'granted' || currentStatus === 'expired';
-
-                        return (
-                            <TableRow key={rowId} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                                <TableCell component="th" scope="row">
-                                    {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
-                                        <Tooltip title={row.title} placement="top-start" arrow>
-                                            <div className="max-w-50 truncate">
-                                                {row.url ? (
-                                                    <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
-                                                        {row.title}
-                                                    </a>
-                                                ) : (
-                                                    row.title
-                                                )}
-                                            </div>
-                                        </Tooltip>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    {isEditing ? renderInput(`inventors_${rowId}`, "Inventors", row.inventors) : row.inventors}
-                                </TableCell>
-                                <TableCell>
-                                    {isEditing ? (
-                                        <select
-                                            name={`status_${rowId}`}
-                                            value={currentStatus}
-                                            onChange={(e) => setEditStatuses(prev => ({ ...prev, [rowId]: e.target.value }))}
-                                            className="border-b-2 focus:outline-none focus:border-blue-500 w-full mt-2 bg-transparent"
-                                        >
-                                            <option value="Filed">Filed</option>
-                                            <option value="Published">Published</option>
-                                            <option value="Granted">Granted</option>
-                                            <option value="Expired">Expired</option>
-                                        </select>
-                                    ) : (
-                                        <span className="capitalize">{row.status}</span>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    {isEditing ? (
-                                        <>
-                                            {renderInput(`appnum_${rowId}`, "Application Number", row.application_number)}
-                                            {renderInput(`patnum_${rowId}`, "Patent Number", row.patent_number)}
-                                        </>
-                                    ) : (
-                                        <>
-                                            {showApplicationNumber && (
-                                                <div className="flex flex-col">
-                                                    <span className="text-xs text-gray-500 font-semibold uppercase">Application Number</span>
-                                                    <span>{row.application_number || "N/A"}</span>
-                                                </div>
-                                            )}
-                                            {showPatentNumber && (
-                                                <div className="flex flex-col">
-                                                    <span className="text-xs text-gray-500 font-semibold uppercase">Patent Number</span>
-                                                    <span>{row.patent_number || "N/A"}</span>
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                </TableCell>
-                                {showURLColumn > 0 && (
-                                    <TableCell>
-                                        {isEditing ? renderInput(`url_${rowId}`, "URL", row.url) : null}
-                                    </TableCell>
-                                )}
+        <div className="mb-6">
+            {heading && <h3 className="text-xl mb-4" id={headingId}>{heading}</h3>}
+            <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 650 }} aria-label="patents table" size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Title</TableCell>
+                            <TableCell>Inventors</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>App / Patent Number</TableCell>
+                            {showURLColumn > 0 ? <TableCell>URL</TableCell> : null}
+                            {editMode && (
                                 <TableCell align="right">
-                                    {isEditing ? (
-                                        <div className="flex justify-end min-w-max">
-                                            <Button onClick={handleSave} name={rowId}>Save</Button>
-                                            <Button onClick={handleCancel} name={rowId}>Cancel</Button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex justify-end min-w-max">
-                                            <Button onClick={(e) => handleEdit(e, row.status)} name={rowId}>Edit</Button>
-                                            <Button onClick={handleDelete} name={rowId}>Delete</Button>
-                                        </div>
-                                    )}
+                                    <Button
+                                        onClick={() => {
+                                            if (patents.find((p) => p.title === "")) return;
+                                            const tempId = `temp_${Date.now()}`;
+                                            const newPatent: Patent = {
+                                                id: tempId,
+                                                title: "",
+                                                inventors: "",
+                                                status: "filed",
+                                                patent_number: "",
+                                                application_number: "",
+                                                url: "",
+                                            };
+                                            setShowURLColumn(showURLColumn + 1);
+                                            setPatents([newPatent, ...patents]);
+                                            setOnEdit((prev) => ({ ...prev, [tempId]: true }));
+                                            setEditStatuses((prev) => ({ ...prev, [tempId]: "filed" }));
+                                        }}
+                                    >
+                                        Add
+                                    </Button>
                                 </TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                            )}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {patents.map((row) => {
+                            const rowId = row.id.toString();
+                            const isEditing = onEdit[rowId];
+                            const currentStatus = isEditing ? editStatuses[rowId] : row.status?.toLowerCase();
+
+                            const showApplicationNumber = currentStatus === 'filed' || currentStatus === 'filled' || currentStatus === 'published';
+                            const showPatentNumber = currentStatus === 'granted' || currentStatus === 'expired';
+
+                            return (
+                                <TableRow key={rowId} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                                    <TableCell component="th" scope="row">
+                                        {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
+                                            <Tooltip title={row.title} placement="top-start" arrow>
+                                                <div className="max-w-50 truncate">
+                                                    {row.url ? (
+                                                        <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
+                                                            {row.title}
+                                                        </a>
+                                                    ) : (
+                                                        row.title
+                                                    )}
+                                                </div>
+                                            </Tooltip>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {isEditing ? renderInput(`inventors_${rowId}`, "Inventors", row.inventors) : row.inventors}
+                                    </TableCell>
+                                    <TableCell>
+                                        {isEditing ? (
+                                            <select
+                                                name={`status_${rowId}`}
+                                                value={currentStatus}
+                                                onChange={(e) => setEditStatuses(prev => ({ ...prev, [rowId]: e.target.value }))}
+                                                className="border-b-2 focus:outline-none focus:border-blue-500 w-full mt-2 bg-transparent"
+                                            >
+                                                <option value="Filed">Filed</option>
+                                                <option value="Published">Published</option>
+                                                <option value="Granted">Granted</option>
+                                                <option value="Expired">Expired</option>
+                                            </select>
+                                        ) : (
+                                            <span className="capitalize">{row.status}</span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {isEditing ? (
+                                            <>
+                                                {renderInput(`appnum_${rowId}`, "Application Number", row.application_number)}
+                                                {renderInput(`patnum_${rowId}`, "Patent Number", row.patent_number)}
+                                            </>
+                                        ) : (
+                                            <>
+                                                {showApplicationNumber && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs text-gray-500 font-semibold uppercase">Application Number</span>
+                                                        <span>{row.application_number || "N/A"}</span>
+                                                    </div>
+                                                )}
+                                                {showPatentNumber && (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs text-gray-500 font-semibold uppercase">Patent Number</span>
+                                                        <span>{row.patent_number || "N/A"}</span>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                    </TableCell>
+                                    {showURLColumn > 0 && (
+                                        <TableCell>
+                                            {isEditing ? renderInput(`url_${rowId}`, "URL", row.url) : null}
+                                        </TableCell>
+                                    )}
+                                    {editMode && (
+                                        <TableCell align="right">
+                                            {isEditing ? (
+                                                <div className="flex justify-end min-w-max">
+                                                    <Button onClick={handleSave} name={rowId}>Save</Button>
+                                                    <Button onClick={handleCancel} name={rowId}>Cancel</Button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-end min-w-max">
+                                                    <Button onClick={(e) => handleEdit(e, row.status)} name={rowId}>Edit</Button>
+                                                    <Button onClick={handleDelete} name={rowId}>Delete</Button>
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
     );
 }

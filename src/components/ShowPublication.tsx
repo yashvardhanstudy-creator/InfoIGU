@@ -87,7 +87,7 @@ interface Publication {
   url: string;
 }
 
-export default function ShowPublication({ id }: { id: number }) {
+export default function ShowPublication({ id, heading, headingId, editMode }: { id: number; heading?: string; headingId?: string; editMode?: boolean; }) {
   const [loading, setLoading] = React.useState(!!id);
   const [publications, setPublications] = React.useState<Publication[]>([]);
   const [onEdit, setOnEdit] = React.useState<{ [key: string]: boolean }>({});
@@ -251,98 +251,109 @@ export default function ShowPublication({ id }: { id: number }) {
     return <div className="text-center p-4">Loading...</div>;
   }
 
+  if (publications.length === 0 && !editMode) {
+    return null;
+  }
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="publication table" size="small">
-        <TableHead>
-          <TableRow>
-            <TableCell>Title</TableCell>
-            <TableCell>Publish Date</TableCell>
-            {showURLColumn > 0 ? <TableCell>URL</TableCell> : null}
-            <TableCell align="right">
-              <Button onClick={handleAdd}>Add</Button>
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {(rowsPerPage > 0
-            ? publications.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-            : publications).map((row) => {
-              const rowId = row.id.toString();
-              const isEditing = onEdit[rowId];
-              return (
-                <TableRow
-                  key={rowId}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
-                      <Tooltip title={row.title} placement="top-start" arrow>
-                        <div className="max-w-[200px] truncate">
-                          {row.url ? (
-                            <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
-                              {row.title}
-                            </a>
-                          ) : (
-                            row.title
-                          )}
-                        </div>
-                      </Tooltip>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {isEditing ? renderInput(`publish_date_${rowId}`, "Publish Date", row.publish_date) : row.publish_date}
-                  </TableCell>
-                  {showURLColumn > 0 && (
-                    <TableCell>
-                      {isEditing ? renderInput(`url_${rowId}`, "URL", row.url) : null}
-                    </TableCell>
-                  )}
-                  <TableCell align="right">
-                    {isEditing ? (
-                      <div className="flex justify-end min-w-max">
-                        <Button onClick={handleSave} name={rowId}>Save</Button>
-                        <Button onClick={handleCancel} name={rowId}>Cancel</Button>
-                      </div>
-                    ) : (
-                      <div className="flex justify-end min-w-max">
-                        <Button onClick={handleEdit} name={rowId}>Edit</Button>
-                        <Button onClick={handleDelete} name={rowId}>Delete</Button>
-                      </div>
-                    )}
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <TableCell colSpan={showURLColumn > 0 ? 4 : 3} />
+    <div className="mb-6">
+      {heading && <h3 className="text-xl mb-4" id={headingId}>{heading}</h3>}
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="publication table" size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>Title</TableCell>
+              <TableCell>Publish Date</TableCell>
+              {showURLColumn > 0 ? <TableCell>URL</TableCell> : null}
+              {editMode && (
+                <TableCell align="right">
+                  <Button onClick={handleAdd}>Add</Button>
+                </TableCell>
+              )}
             </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={showURLColumn > 0 ? 4 : 3}
-              count={publications.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              slotProps={{
-                select: {
-                  inputProps: {
-                    'aria-label': 'rows per page',
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? publications.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : publications).map((row) => {
+                const rowId = row.id.toString();
+                const isEditing = onEdit[rowId];
+                return (
+                  <TableRow
+                    key={rowId}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">
+                      {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
+                        <Tooltip title={row.title} placement="top-start" arrow>
+                          <div className="max-w-50 truncate">
+                            {row.url ? (
+                              <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
+                                {row.title}
+                              </a>
+                            ) : (
+                              row.title
+                            )}
+                          </div>
+                        </Tooltip>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {isEditing ? renderInput(`publish_date_${rowId}`, "Publish Date", row.publish_date) : row.publish_date}
+                    </TableCell>
+                    {showURLColumn > 0 && (
+                      <TableCell>
+                        {isEditing ? renderInput(`url_${rowId}`, "URL", row.url) : null}
+                      </TableCell>
+                    )}
+                    {editMode && (
+                      <TableCell align="right">
+                        {isEditing ? (
+                          <div className="flex justify-end min-w-max">
+                            <Button onClick={handleSave} name={rowId}>Save</Button>
+                            <Button onClick={handleCancel} name={rowId}>Cancel</Button>
+                          </div>
+                        ) : (
+                          <div className="flex justify-end min-w-max">
+                            <Button onClick={handleEdit} name={rowId}>Edit</Button>
+                            <Button onClick={handleDelete} name={rowId}>Delete</Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              })}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={(showURLColumn > 0 ? 3 : 2) + (editMode ? 1 : 0)} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                colSpan={(showURLColumn > 0 ? 3 : 2) + (editMode ? 1 : 0)}
+                count={publications.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                slotProps={{
+                  select: {
+                    inputProps: {
+                      'aria-label': 'rows per page',
+                    },
+                    native: true,
                   },
-                  native: true,
-                },
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </div>
   );
 }

@@ -19,7 +19,7 @@ interface Book {
     url: string;
 }
 
-export default function ShowBooks({ id }: { id: number }) {
+export default function ShowBooks({ id, heading, headingId, editMode }: { id: number; heading?: string; headingId?: string; editMode?: boolean; }) {
     const [loading, setLoading] = React.useState(!!id);
     const [books, setBooks] = React.useState<Book[]>([]);
     const [onEdit, setOnEdit] = React.useState<{ [key: string]: boolean }>({});
@@ -170,97 +170,108 @@ export default function ShowBooks({ id }: { id: number }) {
         return <div className="text-center p-4">Loading...</div>;
     }
 
+    if (books.length === 0 && !editMode) {
+        return null;
+    }
+
     return (
-        <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="books table" size="small">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Title</TableCell>
-                        <TableCell>ISBN</TableCell>
-                        <TableCell>Authors</TableCell>
-                        <TableCell>Publish Date</TableCell>
-                        <TableCell>Edition</TableCell>
-                        {showURLColumn ? <TableCell>URL</TableCell> : null}
-                        <TableCell align="right">
-                            <Button
-                                onClick={() => {
-                                    if (books.find((b) => b.title === "")) return;
-                                    const tempId = `temp_${Date.now()}`;
-                                    const newBook: Book = {
-                                        id: tempId,
-                                        title: "",
-                                        isbn: "",
-                                        publish_date: "",
-                                        edition: "",
-                                        authors: "",
-                                        url: "",
-                                    };
-                                    setShowURLColumn(showURLColumn + 1);
-                                    setBooks([newBook, ...books]);
-                                    setOnEdit((prev) => ({ ...prev, [tempId]: true }));
-                                }}
-                            >
-                                Add
-                            </Button>
-                        </TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {books.map((row) => {
-                        const rowId = row.id.toString();
-                        const isEditing = onEdit[rowId];
-                        return (
-                            <TableRow key={rowId} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                                <TableCell component="th" scope="row">
-                                    {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
-                                        <Tooltip title={row.title} placement="top-start" arrow>
-                                            <div className="max-w-50 truncate">
-                                                {row.url ? (
-                                                    <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
-                                                        {row.title}
-                                                    </a>
-                                                ) : (
-                                                    row.title
-                                                )}
-                                            </div>
-                                        </Tooltip>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    {isEditing ? renderInput(`isbn_${rowId}`, "ISBN", row.isbn) : row.isbn}
-                                </TableCell>
-                                <TableCell>
-                                    {isEditing ? renderInput(`authors_${rowId}`, "Authors", row.authors) : row.authors}
-                                </TableCell>
-                                <TableCell>
-                                    {isEditing ? renderInput(`publish_date_${rowId}`, "Publish Date", row.publish_date) : row.publish_date}
-                                </TableCell>
-                                <TableCell>
-                                    {isEditing ? renderInput(`edition_${rowId}`, "Edition", row.edition) : row.edition}
-                                </TableCell>
-                                {isEditing && (
-                                    <TableCell>
-                                        {isEditing ? renderInput(`url_${rowId}`, "URL", row.url) : row.url}
-                                    </TableCell>
-                                )}
+        <div className="mb-6">
+            {heading && <h3 className="text-xl mb-4" id={headingId}>{heading}</h3>}
+            <TableContainer component={Paper}>
+                <Table sx={{ minWidth: 650 }} aria-label="books table" size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Title</TableCell>
+                            <TableCell>ISBN</TableCell>
+                            <TableCell>Authors</TableCell>
+                            <TableCell>Publish Date</TableCell>
+                            <TableCell>Edition</TableCell>
+                            {showURLColumn ? <TableCell>URL</TableCell> : null}
+                            {editMode && (
                                 <TableCell align="right">
-                                    {isEditing ? (
-                                        <div className="flex justify-end min-w-max">
-                                            <Button onClick={handleSave} name={rowId}>Save</Button>
-                                            <Button onClick={handleCancel} name={rowId}>Cancel</Button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex justify-end min-w-max">
-                                            <Button onClick={handleEdit} name={rowId}>Edit</Button>
-                                            <Button onClick={handleDelete} name={rowId}>Delete</Button>
-                                        </div>
-                                    )}
+                                    <Button
+                                        onClick={() => {
+                                            if (books.find((b) => b.title === "")) return;
+                                            const tempId = `temp_${Date.now()}`;
+                                            const newBook: Book = {
+                                                id: tempId,
+                                                title: "",
+                                                isbn: "",
+                                                publish_date: "",
+                                                edition: "",
+                                                authors: "",
+                                                url: "",
+                                            };
+                                            setShowURLColumn(showURLColumn + 1);
+                                            setBooks([newBook, ...books]);
+                                            setOnEdit((prev) => ({ ...prev, [tempId]: true }));
+                                        }}
+                                    >
+                                        Add
+                                    </Button>
                                 </TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                            )}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {books.map((row) => {
+                            const rowId = row.id.toString();
+                            const isEditing = onEdit[rowId];
+                            return (
+                                <TableRow key={rowId} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                                    <TableCell component="th" scope="row">
+                                        {isEditing ? renderInput(`title_${rowId}`, "Title", row.title, true) : (
+                                            <Tooltip title={row.title} placement="top-start" arrow>
+                                                <div className="max-w-50 truncate">
+                                                    {row.url ? (
+                                                        <a href={row.url} target="_blank" rel="noopener noreferrer" className="text-blue-800 hover:underline">
+                                                            {row.title}
+                                                        </a>
+                                                    ) : (
+                                                        row.title
+                                                    )}
+                                                </div>
+                                            </Tooltip>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        {isEditing ? renderInput(`isbn_${rowId}`, "ISBN", row.isbn) : row.isbn}
+                                    </TableCell>
+                                    <TableCell>
+                                        {isEditing ? renderInput(`authors_${rowId}`, "Authors", row.authors) : row.authors}
+                                    </TableCell>
+                                    <TableCell>
+                                        {isEditing ? renderInput(`publish_date_${rowId}`, "Publish Date", row.publish_date) : row.publish_date}
+                                    </TableCell>
+                                    <TableCell>
+                                        {isEditing ? renderInput(`edition_${rowId}`, "Edition", row.edition) : row.edition}
+                                    </TableCell>
+                                    {isEditing && (
+                                        <TableCell>
+                                            {isEditing ? renderInput(`url_${rowId}`, "URL", row.url) : row.url}
+                                        </TableCell>
+                                    )}
+                                    {editMode && (
+                                        <TableCell align="right">
+                                            {isEditing ? (
+                                                <div className="flex justify-end min-w-max">
+                                                    <Button onClick={handleSave} name={rowId}>Save</Button>
+                                                    <Button onClick={handleCancel} name={rowId}>Cancel</Button>
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-end min-w-max">
+                                                    <Button onClick={handleEdit} name={rowId}>Edit</Button>
+                                                    <Button onClick={handleDelete} name={rowId}>Delete</Button>
+                                                </div>
+                                            )}
+                                        </TableCell>
+                                    )}
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
     );
 }

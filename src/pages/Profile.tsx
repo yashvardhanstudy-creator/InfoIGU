@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import ProfileHero from "../components/ProfileHero";
+import EditProfileHero from "../components/EditProfileHero";
 import ProfileNav from "../components/ProfileNav3";
 import ProfileResume from "../components/ProfileResume";
 import UserProfile from "../components/UserProfile";
@@ -39,7 +39,6 @@ const Profile = () => {
   if (loading) return <div className="text-center mt-10 text-[#1A365D] font-bold">Loading Profile...</div>;
   if (!userData) return <div className="text-center mt-10 text-red-500 font-bold">Profile not found. Please log in.</div>;
 
-  const resumeData = userData.resume_data || {};
 
   return (
     <>
@@ -49,20 +48,16 @@ const Profile = () => {
       >
         &larr; Go Back
       </button>
-      <ProfileHero data={userData} />
+      <EditProfileHero data={userData} editMode={false} />
       <div className="MuiBox-root flex overflow-hidden h-lvh lg:m-auto sm:m-0 lg:w-4/5 sm:w-full justify-around">
         <ProfileNav />
 
         <ProfileResume
+          researchInterests={"userData.research_interests"}
           name={urlName}
           id={userData.id}
-          researchinterests={resumeData.researchinterests ? resumeData.researchinterests : 'sd'}
-          biosketch={resumeData.biosketch ? resumeData.biosketch : 'sd'}
-          honors={resumeData.honors ? resumeData.honors : 'sd'}
-          students={resumeData.students ? resumeData.students : 'sd'}
-          miscellaneous={resumeData.miscellaneous ? resumeData.miscellaneous : 'sd'}
-          research={resumeData.research ? resumeData.research : 'sd'}
-          teacherengagement={resumeData.teacherengagement ? resumeData.teacherengagement : 'sd'}
+          editMode={false}
+
         />
       </div>
     </>

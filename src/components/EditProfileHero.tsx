@@ -13,7 +13,9 @@ interface ProfileData {
   image?: File;
 }
 
-const EditProfile = (user: any) => {
+const EditProfile = (props: any) => {
+  const { data, editMode } = props;
+  const [isEditing, setIsEditing] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     name: "",
     designation: "",
@@ -22,30 +24,28 @@ const EditProfile = (user: any) => {
     phone: "",
     profile_pic_url: "",
   });
-  const [isEditing, setIsEditing] = useState(false);
   // Simulate data fetching on component mount
   const fetchedDataOG = useRef<ProfileData | null>(null); // Use useRef to store initial data
   const [imageFile, setImageFile] = useState<File>();
   const [previewUrl, setPreviewUrl] = useState<string>("");
 
   useEffect(() => {
-    console.log(user);
     const initialData: ProfileData = {
-      name: user.user.name,
-      designation: user.user.designation,
-      department: user.user.department,
-      email: user.user.email,
-      phone: user.user.phone,
+      name: data.name,
+      designation: data.designation,
+      department: data.department,
+      email: data.email,
+      phone: data.phone,
       profile_pic_url: constants.SERVER_URL + "default.png",
     };
 
     const fetchImage = async () => {
       try {
-        const imageUrl = constants.SERVER_URL + user.user.name + "_" + user.user.department + ".png";
+        const imageUrl = constants.SERVER_URL + data.name + "_" + data.department + ".png";
         const response = await fetch(imageUrl);
         if (response.ok) {
           const blob = await response.blob();
-          const file = new File([blob], `${user.user.name}_${user.user.department}.png`, { type: blob.type });
+          const file = new File([blob], `${data.name}_${data.department}.png`, { type: blob.type });
           setImageFile(file);
           setPreviewUrl(URL.createObjectURL(file));
           initialData.profile_pic_url = imageUrl;
@@ -59,14 +59,13 @@ const EditProfile = (user: any) => {
     };
 
     fetchImage();
-  }, []); // Empty dependency array means this effect runs once after the initial render
+  }, [data]); // Add data to dependency array
 
   const handleExit = () => {
     if (fetchedDataOG.current) {
       setProfileData(fetchedDataOG.current); // Reset to original data on cancel
     }
     setIsEditing(false);
-    // Optionally, you could reset profileData to the original fetched data here if you want to discard changes
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -82,16 +81,12 @@ const EditProfile = (user: any) => {
       setImageFile(file);
       setPreviewUrl(URL.createObjectURL(file)); // Create a local URL for preview
     }
-    // In a real app, you'd upload to a server. 
-    // Since we are saving to public/profile_picture, we simulate the path.
-    // Note: Browser security prevents JS from writing directly to the filesystem.
-    // This assumes your backend handles the actual move to the folder
+
   };
 
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // Here you would typically send the profileData to your backend API to save changes
 
     const formData = new FormData();
     formData.append("name", profileData.name);
@@ -119,7 +114,6 @@ const EditProfile = (user: any) => {
 
     console.log("Saving changes:", profileData);
     setIsEditing(false);
-    // You might want to add error handling or a success notification here
 
   };
 
@@ -137,7 +131,7 @@ const EditProfile = (user: any) => {
               alt="Profile Pic"
             /> */}
             <img
-              src={previewUrl || `${constants.SERVER_URL}${user.name}_${user.department}.png`}
+              src={previewUrl || `${constants.SERVER_URL}${data.name}_${data.department}.png`}
               onError={(e) => { e.currentTarget.src = constants.PROFILE_PIC_URL; }}
               alt={profileData.name}
               className="size-16 md:size-24 lg:size-32 rounded-full object-cover"
@@ -240,30 +234,39 @@ const EditProfile = (user: any) => {
             </div>
             <p className="text-[#cfdbe6] text-sm "></p>
             <div className="flex justify-center md:justify-end gap-2">
-              {isEditing ? (
+              {editMode ? (
                 <>
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleExit}
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    Cancel
-                  </button>
+                  {isEditing ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleSubmit}
+                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        Save Changes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleExit}
+                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        Cancel
+                      </button>
+                    </>
+
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => { setIsEditing(true); }}
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    >
+                      Edit Profile
+                    </button>
+                  )}
                 </>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setIsEditing(true)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Edit Profile
+                <button className="border-[#0067B3] border-2 px-4 py-2 rounded-xl hover:bg-[#ccefff] hover:text-[#353434] transition duration-200 font-bold text-sm">
+                  Download Resume
                 </button>
               )}
             </div>

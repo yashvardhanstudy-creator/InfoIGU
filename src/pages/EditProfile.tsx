@@ -1,26 +1,15 @@
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import EditProfileHero from "../components/EditProfileHero";
 import ProfileNav from "../components/ProfileNav3";
 import ProfileResume from "../components/ProfileResume";
 import UserProfile from "../components/UserProfile";
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 
-
-
-
-interface EditProfileProps {
-  researchinterests?: string;
-  biosketch?: string;
-  research?: string;
-  honors?: string;
-  students?: string;
-  miscellaneous?: string;
-}
-
-const EditProfile = (props: EditProfileProps) => {
+const Profile = () => {
   const { name: urlName } = useParams();
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditMode, setIsEditMode] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,13 +23,13 @@ const EditProfile = (props: EditProfileProps) => {
       try {
         const response = await fetch(`http://localhost:5000/api/profiles/profile/${name}`);
         const data = await response.json();
+        console.log(data);
         if (data && data.length > 0) {
           setUserData(data[0]);
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);
       } finally {
-        console.log(userData);
         setLoading(false);
       }
     };
@@ -51,7 +40,6 @@ const EditProfile = (props: EditProfileProps) => {
   if (loading) return <div className="text-center mt-10 text-[#1A365D] font-bold">Loading Profile...</div>;
   if (!userData) return <div className="text-center mt-10 text-red-500 font-bold">Profile not found. Please log in.</div>;
 
-  const resumeData = userData.resume_data || {};
 
   return (
     <>
@@ -61,21 +49,19 @@ const EditProfile = (props: EditProfileProps) => {
       >
         &larr; Go Back
       </button>
-      <EditProfileHero user={userData} />
-      <div className="flex overflow-hidden h-dvh lg:w-4/5 w-[95%] m-auto justify-around">
+      <EditProfileHero data={userData} editMode={isEditMode} setEditMode={setIsEditMode} isEdit={true} />
+      <div className="MuiBox-root flex overflow-hidden h-lvh lg:m-auto sm:m-0 lg:w-4/5 sm:w-full justify-around">
         <ProfileNav />
+
         <ProfileResume
-          researchinterests={resumeData.researchinterests || 'sd'}
-          biosketch={resumeData.biosketch || 'sd'}
-          honors={resumeData.honors || 'sd'}
-          students={resumeData.students || 'sd'}
-          miscellaneous={resumeData.miscellaneous || 'sd'}
-          research={resumeData.research || 'sd'}
-          teacherengagement={resumeData.teacherengagement || 'sd'}
+          name={urlName}
+          id={userData.id}
+          editMode={isEditMode}
+
         />
       </div>
     </>
   );
 };
 
-export default EditProfile;
+export default Profile;

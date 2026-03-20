@@ -10,10 +10,14 @@ import { professionData } from './constants';
 
 
 export default function ShowProfession({
-  name, id
+  name, id, type, heading, headingId, editMode
 }: {
   name: string,
-  id: number;
+  id: number,
+  type: string;
+  heading?: string;
+  headingId?: string;
+  editMode?: boolean;
 }) {
   const [loading, setLoading] = React.useState(!!name);
   const [professions, setProfessions] = React.useState(professionData);
@@ -30,7 +34,7 @@ export default function ShowProfession({
     const fetchEducation = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/education/${id}`);
+        const response = await fetch(`http://localhost:5000/api/education/${id}/${type}`);
         if (!response.ok) {
           throw new Error('Failed to fetch education data');
         }
@@ -102,6 +106,7 @@ export default function ShowProfession({
             name: name,
             head: inputElementProf.value,
             date_range: inputElementDateRange.value,
+            type: type
           }),
         });
 
@@ -137,96 +142,109 @@ export default function ShowProfession({
     return <div className="text-center p-4">Loading...</div>;
   }
 
+  if (professions.length === 0 && !editMode) {
+    return null;
+  }
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="profession table">
-        <TableBody>
-          <TableRow>
-            <TableCell>Profession</TableCell>
-            <TableCell align="right">Date Range</TableCell>
-            <TableCell align="right">
-              <Button
-                onClick={() => {
-                  if (professions.find((prof) => prof.head === ""))
-                    return;
-                  const newProfession = {
-                    id: professions.length + 1,
-                    head: "",
-                    date_range: "",
-                  };
-                  setProfessions([newProfession, ...professions]);
-                  setOnEdit((prev) => ({
-                    ...prev,
-                    [newProfession.head]: true,
-                  }));
-                }}
-              >
-                Add
-              </Button>
-            </TableCell>
-            <TableCell align="right"></TableCell>
-          </TableRow>
-          {professions.map((row) => (
-            <TableRow
-              key={row.id}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                {row.head}
-                {onEdit[row.head] && (
-                  <input
-                    className="border-b-2 focus:outline-none focus:border-blue-500"
-                    placeholder="profession"
-                    name={row.head}
-                    style={{ display: "block", marginTop: "0.5rem" }}
-                    required={true}
-                  />
-                )}
-              </TableCell>
-              <TableCell align="right">
-                {row.date_range}
-                {onEdit[row.head] && (
-                  <input
-                    className="border-b-2 place-self-end placeholder:place-self-end-safe focus:outline-none focus:border-blue-500"
-                    placeholder="date range"
-                    name={row.head + "date"}
-                    style={{ display: "block", marginTop: "0.5rem" }}
-                    required={true}
-                  />
-                )}
-              </TableCell>
-              {onEdit[row.head] && (
+    <div className="mb-6">
+      {heading && <h3 className="text-xl mb-4" id={headingId}>{heading}</h3>}
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="profession table">
+          <TableBody>
+            <TableRow>
+              <TableCell>Profession</TableCell>
+              <TableCell align="right">Date Range</TableCell>
+              {editMode && (
                 <>
                   <TableCell align="right">
-                    <Button onClick={handleSave} name={row.head}>
-                      Save
+                    <Button
+                      onClick={() => {
+                        if (professions.find((prof) => prof.head === ""))
+                          return;
+                        const newProfession = {
+                          id: professions.length + 1,
+                          head: "",
+                          date_range: "",
+                          type: type
+                        };
+                        setProfessions([newProfession, ...professions]);
+                        setOnEdit((prev) => ({
+                          ...prev,
+                          [newProfession.head]: true,
+                        }));
+                      }}
+                    >
+                      Add
                     </Button>
                   </TableCell>
-                  <TableCell align="right" width={"2px"}>
-                    <Button onClick={handleCancel} name={row.head}>
-                      Cancel
-                    </Button>
-                  </TableCell>
-                </>
-              )}
-              {!onEdit[row.head] && (
-                <>
-                  <TableCell align="right" width={"2px"}>
-                    <Button onClick={handleEdit} name={row.head}>
-                      Edit
-                    </Button>
-                  </TableCell>
-                  <TableCell align="right" width={"2px"}>
-                    <Button onClick={handleDelete} name={row.head}>
-                      Delete
-                    </Button>
-                  </TableCell>
+                  <TableCell align="right"></TableCell>
                 </>
               )}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+            {professions.map((row) => (
+              <TableRow
+                key={row.id}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.head}
+                  {onEdit[row.head] && (
+                    <input
+                      className="border-b-2 focus:outline-none focus:border-blue-500"
+                      placeholder="profession"
+                      name={row.head}
+                      style={{ display: "block", marginTop: "0.5rem" }}
+                      required={true}
+                    />
+                  )}
+                </TableCell>
+                <TableCell align="right">
+                  {row.date_range}
+                  {onEdit[row.head] && (
+                    <input
+                      className="border-b-2 place-self-end placeholder:place-self-end-safe focus:outline-none focus:border-blue-500"
+                      placeholder="date range"
+                      name={row.head + "date"}
+                      style={{ display: "block", marginTop: "0.5rem" }}
+                      required={true}
+                    />
+                  )}
+                </TableCell>
+                {editMode && (
+                  onEdit[row.head] ? (
+                    <>
+                      <TableCell align="right">
+                        <Button onClick={handleSave} name={row.head}>
+                          Save
+                        </Button>
+                      </TableCell>
+                      <TableCell align="right" width={"2px"}>
+                        <Button onClick={handleCancel} name={row.head}>
+                          Cancel
+                        </Button>
+                      </TableCell>
+                    </>
+                  ) : (
+                    <>
+                      <TableCell align="right" width={"2px"}>
+                        <Button onClick={handleEdit} name={row.head}>
+                          Edit
+                        </Button>
+                      </TableCell>
+                      <TableCell align="right" width={"2px"}>
+                        <Button onClick={handleDelete} name={row.head}>
+                          Delete
+                        </Button>
+                      </TableCell>
+                    </>
+                  )
+                )}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   );
 }
