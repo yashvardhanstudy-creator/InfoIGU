@@ -75,8 +75,10 @@ const Auth = () => {
                     <p className="mb-6 text-gray-600">You are currently logged into your session.</p>
                     <button
                         onClick={() => {
+
                             UserProfile.setName('');
                             UserProfile.setRole(false);
+                            navigate('/');
                             setIsLoggedIn(false);
                         }}
                         className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"

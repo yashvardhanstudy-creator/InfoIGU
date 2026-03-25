@@ -112,20 +112,18 @@ const ProfileNav = () => {
         ${isOpen ? "translate-x-0" : "-translate-x-full"}
         overflow-y-auto border-r lg:border-none p-4
       `}>
-          <div className="w-full p-2 text-black hide-scrollbar min-h-20 rounded-2xl cursor-pointer">
+          <div className="w-full p-4 text-black hide-scrollbar min-h-20 rounded-2xl cursor-pointer shadow-sm border border-gray-100 bg-white">
             <div
-              className="vertical-list-head ui sub-heading"
+              className="vertical-list-head ui sub-heading text-lg font-bold text-[#1A365D] py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors"
               id="researchinterests-head"
-              style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleContentClick("researchinterests")}
             >
               Research Interests
             </div>
-            <hr />
+            <hr className="my-2 border-gray-100" />
             <div
-              className="vertical-list-head ui sub-heading"
+              className="vertical-list-head ui sub-heading text-lg font-bold text-[#1A365D] py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors"
               id="biosketch-head"
-              style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleHeadClick("biosketch-head")}
             >
               Biosketch
@@ -135,25 +133,24 @@ const ProfileNav = () => {
               style={{ display: "block", marginLeft: "8px" }}
             >
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("educationaldetails")}
                 id="educationaldetailsd"
               >
                 Educational Details
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("professionalbackground")}
                 id="professionalbackgroundd"
               >
                 Professional Background
               </div>
             </div>
-            <hr />
+            <hr className="my-2 border-gray-100" />
             <div
-              className="ui one-liner-captions vertical-list-head sub-heading"
+              className="ui one-liner-captions vertical-list-head sub-heading text-lg font-bold text-[#1A365D] py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors"
               id="research-head"
-              style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleHeadClick("research-head")}
             >
               Research
@@ -163,46 +160,45 @@ const ProfileNav = () => {
               style={{ display: "block", marginLeft: "8px" }}
             >
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("projects")}
                 id="projectsd"
               >
                 Projects
               </div>
               <div
-                className="ui one-liner-captions active-list-item"
+                className="ui one-liner-captions active-list-item text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("publications")}
                 id="publicationsd"
               >
                 Publications
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("patents")}
                 id="patentsd"
               >
                 Patents
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("books")}
                 id="booksd"
               >
                 Books
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("collaborations")}
                 id="collaborationsd"
               >
                 Collaborations
               </div>
             </div>
-            <hr />
+            <hr className="my-2 border-gray-100" />
             <div
-              className="vertical-list-head ui sub-heading"
+              className="vertical-list-head ui sub-heading text-lg font-bold text-[#1A365D] py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors"
               id="honoursandawards-head"
-              style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleHeadClick("honoursandawards-head")}
             >
               Honours and Awards
@@ -212,25 +208,24 @@ const ProfileNav = () => {
               style={{ display: "block", marginLeft: "8px" }}
             >
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("honors")}
                 id="honorsd"
               >
                 Honors
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("memberships")}
                 id="membershipsd"
               >
                 Memberships
               </div>
             </div>
-            <hr />
+            <hr className="my-2 border-gray-100" />
             <div
-              className="vertical-list-head ui sub-heading"
+              className="vertical-list-head ui sub-heading text-lg font-bold text-[#1A365D] py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors"
               id="teachingengagements-head"
-              style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleHeadClick("teachingengagements-head")}
             >
               Teaching Engagements
@@ -240,18 +235,17 @@ const ProfileNav = () => {
               style={{ display: "block", marginLeft: "8px" }}
             >
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("teachingengagements")}
                 id="teachingengagementsd"
               >
                 Teaching Engagements
               </div>
             </div>
-            <hr />
+            <hr className="my-2 border-gray-100" />
             <div
-              className="vertical-list-head ui sub-heading"
+              className="vertical-list-head ui sub-heading text-lg font-bold text-[#1A365D] py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors"
               id="students-head"
-              style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleHeadClick("students-head")}
             >
               Students
@@ -261,25 +255,24 @@ const ProfileNav = () => {
               style={{ display: "block", marginLeft: "8px" }}
             >
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("supervisions")}
                 id="supervisionsd"
               >
                 Supervisions
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("associatescholars")}
                 id="associatescholarsd"
               >
                 Associate Scholars
               </div>
             </div>
-            <hr />
+            <hr className="my-2 border-gray-100" />
             <div
-              className="vertical-list-head ui sub-heading"
+              className="vertical-list-head ui sub-heading text-lg font-bold text-[#1A365D] py-2 px-3 hover:bg-gray-50 rounded-lg transition-colors"
               id="miscellaneous-head"
-              style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleHeadClick("miscellaneous-head")}
             >
               Miscellaneous
@@ -289,28 +282,28 @@ const ProfileNav = () => {
               style={{ display: "block", marginLeft: "8px" }}
             >
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("events")}
                 id="eventsd"
               >
                 Events
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("visits")}
                 id="visitsd"
               >
                 Visits
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("administrativepositions")}
                 id="administrativepositionsd"
               >
                 Administrative Positions{" "}
               </div>
               <div
-                className="ui one-liner-captions"
+                className="ui one-liner-captions text-gray-600 hover:text-[#1A365D] hover:bg-gray-50 py-1.5 px-3 rounded-lg transition-colors"
                 onClick={() => handleContentClick("miscellaneous")}
                 id="miscellaneousd"
               >

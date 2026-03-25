@@ -16,7 +16,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
+    <header className="bg-gray-800 text-white p-4 flex sm:flex-row flex-col items-center justify-between">
       <nav>
 
         <ul className="flex space-x-4">

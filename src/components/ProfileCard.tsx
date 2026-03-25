@@ -69,9 +69,14 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
         </div>
 
         {/* description */}
-        <p title="hello" className="mb-4 line-clamp-3 text-gray-600">
-          {user.research_interests}
-        </p>
+        {user.research_interests && (
+          <div className="mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
+            <span className="text-xs font-bold text-[#1A365D] uppercase tracking-wider mb-1 block">Research Interests</span>
+            <p title={user.research_interests} className="line-clamp-3 text-sm text-gray-600 leading-relaxed">
+              {user.research_interests}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* button */}

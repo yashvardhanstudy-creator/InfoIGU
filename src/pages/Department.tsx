@@ -4,7 +4,7 @@ import Footer from '../components/Footer'
 
 const Department = (props: any) => {
   return (
-    <div>
+    <div className='min-h-dvh'>
       <Header />
       <div className="w-full bg-[#1A365D] min-h-2/5 text-blue-50" style={{ "padding": "3vw 10vw" }}>
         <a href="/" className='text-sm'>Departments &gt; {props.department}</a>

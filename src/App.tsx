@@ -8,6 +8,7 @@ import EditProfile from "./pages/EditProfile";
 import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
 import UserProfile from "./components/UserProfile";
+import ResumePrint from "./pages/ResumePrint";
 
 const NotFound = () => (
   <div className="flex flex-col items-center justify-center h-screen bg-gray-100 text-[#1A365D]">
@@ -40,7 +41,7 @@ function App() {
         }
       />
       <Route path="/contact" element={<Contact />} />
-
+      <Route path="/resume/:name" element={<ResumePrint />} />
       <Route path="/auth" element={<Auth />} />
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -134,7 +134,7 @@ const EditProfile = (props: any) => {
               src={previewUrl || `${constants.SERVER_URL}${data.name}_${data.department}.png`}
               onError={(e) => { e.currentTarget.src = constants.PROFILE_PIC_URL; }}
               alt={profileData.name}
-              className="size-16 md:size-24 lg:size-32 rounded-full object-cover"
+              className="size-20 md:size-28 lg:size-36 rounded-full object-cover border-4 border-white/20 shadow-lg"
             />
             {isEditing && (
               <div className="flex flex-col items-center">
@@ -154,7 +154,7 @@ const EditProfile = (props: any) => {
               {isEditing ? (
                 <input
                   type="text"
-                  className="ml-2 text-white bg-blue-400 p-1 rounded" // Added styling for clarity
+                  className="ml-2 text-black bg-white/90 p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 w-full md:w-auto font-bold"
                   value={profileData.name}
                   name="name"
                   onChange={handleChange}
@@ -166,7 +166,7 @@ const EditProfile = (props: any) => {
                 {isEditing ? (
                   <input
                     type="text"
-                    className="mb-4 text-white p-1 rounded bg-blue-400" // Added styling for clarity
+                    className="mb-4 ml-2 text-black bg-white/90 p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 w-full md:w-auto"
                     value={profileData.designation}
                     name="designation"
                     onChange={handleChange}
@@ -186,7 +186,7 @@ const EditProfile = (props: any) => {
                 {isEditing ? (
                   <input
                     type="text"
-                    className="text-white p-1 rounded bg-blue-400" // Added styling for clarity
+                    className="text-black bg-white/90 p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 w-full"
                     value={profileData.department}
                     name="department"
                     onChange={handleChange}
@@ -204,7 +204,7 @@ const EditProfile = (props: any) => {
                 {isEditing ? (
                   <input
                     type="email" // Use type="email" for better validation
-                    className="text-white p-1 rounded bg-blue-400" // Added styling for clarity
+                    className="text-black bg-white/90 p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 w-full"
                     value={profileData.email}
                     name="email"
                     onChange={handleChange}
@@ -222,7 +222,7 @@ const EditProfile = (props: any) => {
                 {isEditing ? (
                   <input
                     type="tel" // Use type="tel" for phone numbers
-                    className="text-white p-1 rounded bg-blue-400" // Added styling for clarity
+                    className="text-black bg-white/90 p-1.5 rounded focus:outline-none focus:ring-2 focus:ring-blue-300 w-full"
                     value={profileData.phone}
                     name="phone"
                     onChange={handleChange}
@@ -241,14 +241,14 @@ const EditProfile = (props: any) => {
                       <button
                         type="button"
                         onClick={handleSubmit}
-                        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                        className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-5 rounded-lg transition-colors shadow-sm"
                       >
                         Save Changes
                       </button>
                       <button
                         type="button"
                         onClick={handleExit}
-                        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-5 rounded-lg transition-colors shadow-sm"
                       >
                         Cancel
                       </button>
@@ -258,14 +258,17 @@ const EditProfile = (props: any) => {
                     <button
                       type="button"
                       onClick={() => { setIsEditing(true); }}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      className="bg-white/20 hover:bg-white/30 border border-white/40 text-white font-semibold py-2 px-5 rounded-lg transition-all shadow-sm backdrop-blur-sm"
                     >
                       Edit Profile
                     </button>
                   )}
                 </>
               ) : (
-                <button className="border-[#0067B3] border-2 px-4 py-2 rounded-xl hover:bg-[#ccefff] hover:text-[#353434] transition duration-200 font-bold text-sm">
+                <button
+                  type="button"
+                  onClick={() => window.open(`/resume/${encodeURIComponent(data.name)}`, '_blank')}
+                  className="border-[#0067B3] border-2 px-4 py-2 rounded-xl hover:bg-[#ccefff] hover:text-[#353434] transition duration-200 font-bold text-sm">
                   Download Resume
                 </button>
               )}

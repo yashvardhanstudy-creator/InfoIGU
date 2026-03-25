@@ -87,13 +87,13 @@ interface Publication {
   url: string;
 }
 
-export default function ShowPublication({ id, heading, headingId, editMode }: { id: number; heading?: string; headingId?: string; editMode?: boolean; }) {
+export default function ShowPublication({ id, heading, headingId, editMode, isPrint }: { id: number; heading?: string; headingId?: string; editMode?: boolean; isPrint?: boolean; }) {
   const [loading, setLoading] = React.useState(!!id);
   const [publications, setPublications] = React.useState<Publication[]>([]);
   const [onEdit, setOnEdit] = React.useState<{ [key: string]: boolean }>({});
   const [showURLColumn, setShowURLColumn] = React.useState(0);
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(isPrint ? -1 : 5);
 
   React.useEffect(() => {
     const fetchPublications = async () => {
@@ -330,28 +330,30 @@ export default function ShowPublication({ id, heading, headingId, editMode }: { 
               </TableRow>
             )}
           </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                colSpan={(showURLColumn > 0 ? 3 : 2) + (editMode ? 1 : 0)}
-                count={publications.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                slotProps={{
-                  select: {
-                    inputProps: {
-                      'aria-label': 'rows per page',
+          {!isPrint && (
+            <TableFooter className="print:hidden">
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                  colSpan={(showURLColumn > 0 ? 3 : 2) + (editMode ? 1 : 0)}
+                  count={publications.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  slotProps={{
+                    select: {
+                      inputProps: {
+                        'aria-label': 'rows per page',
+                      },
+                      native: true,
                     },
-                    native: true,
-                  },
-                }}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}
-              />
-            </TableRow>
-          </TableFooter>
+                  }}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          )}
         </Table>
       </TableContainer>
     </div>

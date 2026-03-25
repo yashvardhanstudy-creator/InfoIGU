@@ -8,7 +8,7 @@ import ShowProfession from "./ShowProfession";
 import Button from "@mui/material/Button";
 
 const ProfileResume = (props: any) => {
-  const titleStyleh2 = "text-2xl text-[#0067B3] mt-2 mb-4 has-[+h2]:hidden last:hidden";
+  const titleStyleh2 = "text-xl font-bold text-[#1A365D] mt-8 mb-4 border-b-2 border-gray-200 pb-2 uppercase tracking-wide has-[+h2]:hidden last:hidden";
 
   const [isEditingRI, setIsEditingRI] = React.useState(false);
   const [researchInterests, setResearchInterests] = React.useState(props.researchInterests || "");
@@ -33,13 +33,13 @@ const ProfileResume = (props: any) => {
   };
 
   return (
-    <div className="sm:w-full w-auto bg-[#f0f0f0] p-2 hide-scrollbar min-h-20 rounded-2xl overflow-y-auto ">
+    <div className="sm:w-full w-auto bg-white shadow-sm border border-gray-200 print:border-none p-6 md:p-8 hide-scrollbar min-h-20 rounded-2xl overflow-y-auto print:overflow-visible print:h-auto print:shadow-none">
       <>
         <h2 className={titleStyleh2} id="researchinterests">
           RESEARCH INTERESTS
         </h2>
         {(props.editMode || researchInterests) && (
-          <div className="mb-6">
+          <div className="mb-6 lg:w-3/5 sm:w-full sm:mx-auto lg:mx-0">
             {isEditingRI ? (
               <div className="flex flex-col gap-2">
                 <textarea
@@ -55,10 +55,12 @@ const ProfileResume = (props: any) => {
                 </div>
               </div>
             ) : (
-              <div className="group relative">
-                <p className="whitespace-pre-wrap">{researchInterests}</p>
+              <div className="group relative bg-white p-5 rounded-xl border-l-4 border-[#0067B3] shadow-sm transition-all duration-300 hover:shadow-md">
+                <p className="whitespace-pre-wrap text-gray-700 text-base leading-relaxed">{researchInterests}</p>
                 {props.editMode && (
-                  <Button className="mt-2" variant="outlined" size="small" onClick={() => setIsEditingRI(true)}>Edit</Button>
+                  <div className="mt-4 flex justify-end">
+                    <Button variant="outlined" size="small" onClick={() => setIsEditingRI(true)}>Edit Research Interests</Button>
+                  </div>
                 )}
               </div>
             )}
@@ -73,7 +75,7 @@ const ProfileResume = (props: any) => {
       <>
         <h2 className={titleStyleh2}>RESEARCH</h2>
         <ShowResearch id={props.id} heading="Projects" headingId="projects" editMode={props.editMode} />
-        <ShowPublication id={props.id} heading="Publications" headingId="publications" editMode={props.editMode} />
+        <ShowPublication id={props.id} heading="Publications" headingId="publications" editMode={props.editMode} isPrint={props.isPrint} />
         <ShowPatents id={props.id} heading="Patents" headingId="patents" editMode={props.editMode} />
         <ShowBooks id={props.id} heading="Books" headingId="books" editMode={props.editMode} />
         <ShowGeneric id={props.id} endpoint="collaborations" heading="Collaborations" headingId="collaborations" editMode={props.editMode} columns={[
