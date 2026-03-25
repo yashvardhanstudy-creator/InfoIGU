@@ -171,14 +171,14 @@ export default function ShowPublication({ id, heading, headingId, editMode }: { 
 
     if (titleVal) {
       try {
-        if (!pubToSave.startsWith("temp_")) {
-          await fetch(`http://localhost:5000/api/publications/${id}/${pubToSave}`, {
-            method: "DELETE",
-          });
-        }
+        const isNew = pubToSave.startsWith("temp_");
+        const endpointUrl = isNew
+          ? `http://localhost:5000/api/publications/${id}`
+          : `http://localhost:5000/api/publications/${id}/${pubToSave}`;
+        const method = isNew ? "POST" : "PUT";
 
-        const response = await fetch(`http://localhost:5000/api/publications/${id}`, {
-          method: "POST",
+        const response = await fetch(endpointUrl, {
+          method,
           headers: {
             "Content-Type": "application/json",
           },

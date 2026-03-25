@@ -95,15 +95,14 @@ export default function ShowBooks({ id, heading, headingId, editMode }: { id: nu
 
         if (titleVal) {
             try {
-                // Emulate an UPDATE by deleting the old record if it exists
-                if (!bookToSave.startsWith("temp_")) {
-                    await fetch(`http://localhost:5000/api/books/${id}/${bookToSave}`, {
-                        method: "DELETE",
-                    });
-                }
+                const isNew = bookToSave.startsWith("temp_");
+                const endpointUrl = isNew
+                    ? `http://localhost:5000/api/books/${id}`
+                    : `http://localhost:5000/api/books/${id}/${bookToSave}`;
+                const method = isNew ? "POST" : "PUT";
 
-                const response = await fetch(`http://localhost:5000/api/books/${id}`, {
-                    method: "POST",
+                const response = await fetch(endpointUrl, {
+                    method,
                     headers: {
                         "Content-Type": "application/json",
                     },

@@ -79,6 +79,8 @@ const ProfileResume = (props: any) => {
         <ShowGeneric id={props.id} endpoint="collaborations" heading="Collaborations" headingId="collaborations" editMode={props.editMode} columns={[
           { key: "title", label: "Title", required: true },
           { key: "organization", label: "Organization" },
+          { key: "url", label: "URL" },
+          { key: "description", label: "Description" },
           { key: "date_range", label: "Date Range" },
         ]} />
       </>
@@ -100,7 +102,7 @@ const ProfileResume = (props: any) => {
         <h2 className={titleStyleh2}>TEACHER ENGAGEMENT</h2>
         <ShowGeneric id={props.id} endpoint="teaching_engagements" heading="Teaching Engagements" headingId="teachingengagements" editMode={props.editMode} columns={[
           { key: "course_name", label: "Course Name", required: true },
-          { key: "level", label: "Level" },
+          { key: "code", label: "Code" },
           { key: "date_range", label: "Date Range" },
         ]} />
       </>
@@ -108,9 +110,8 @@ const ProfileResume = (props: any) => {
       <>
         <h2 className={titleStyleh2}>STUDENTS</h2>
         <ShowGeneric id={props.id} endpoint="supervisions" heading="Supervisions" headingId="supervisions" editMode={props.editMode} columns={[
-          { key: "student_name", label: "Student Name", required: true },
-          { key: "topic", label: "Topic" },
-          { key: "status", label: "Status" },
+          { key: "topic", label: "Topic", required: true },
+          { key: "other_supervisors", label: "Other Supervisors" },
           { key: "date_range", label: "Date Range" },
         ]} />
         <ShowGeneric id={props.id} endpoint="associate_scholars" heading="Associate Scholars" headingId="associatescholars" editMode={props.editMode} columns={[
@@ -132,14 +133,14 @@ const ProfileResume = (props: any) => {
           { key: "purpose", label: "Purpose" },
           { key: "date_range", label: "Date Range" },
         ]} />
-        <ShowGeneric id={props.id} endpoint="administrative_positions" heading="Administrative Positions" headingId="administrative_positions" editMode={props.editMode} columns={[
-          { key: "location", label: "Location", required: true },
-          { key: "purpose", label: "Purpose" },
+        <ShowGeneric id={props.id} endpoint="administrative_positions" heading="Administrative Positions" headingId="administrativepositions" editMode={props.editMode} columns={[
+          { key: "position", label: "Position", required: true },
+          { key: "organization", label: "Organisation" },
           { key: "date_range", label: "Date Range" },
         ]} />
         <ShowGeneric id={props.id} endpoint="miscellaneous" heading="Miscellaneous" headingId="miscellaneous" editMode={props.editMode} columns={[
-          { key: "location", label: "Location", required: true },
-          { key: "purpose", label: "Purpose" },
+          { key: "title", label: "Title", required: true },
+          { key: "description", label: "Description" },
           { key: "date_range", label: "Date Range" },
         ]} />
       </>

@@ -1,3 +1,4 @@
+import Button from '@mui/material/Button'
 import * as constants from './constants'
 
 export const routes = {
@@ -26,7 +27,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
 
   console.log(user);
   return (
-    <div className="overflow-hidden rounded-xl border border-green-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
 
       {/* Not Button */}
       <div className="p-5 h-4/5">
@@ -34,7 +35,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
         <div className="mb-4 flex flex-col items-center md:flex-row ">
 
           {/* avatar */}
-          <div className="w-fill max-w-28 m- h-auto text-[#9b87f5]">
+          <div className="w-fill max-w-28 h-auto">
             <img
               src={`${constants.SERVER_URL}${user.name}_${user.department}.png`}
               onError={(e) => { e.currentTarget.src = constants.PROFILE_PIC_URL; }}
@@ -54,15 +55,15 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
 
             <span className="text-sm text-gray-500 flex items-center gap-2">
               <img src={constants.DEPARTMENT_SVG} className="size-5" alt="Contact" />
-              <span className="font-semibold text-[#9b87f5]">{user.department}</span>
+              <span className="font-semibold text-[#0067B3]">{user.department}</span>
             </span>
             <span className="text-sm text-gray-500 flex items-center gap-2">
               <img src={constants.EMAIL_SVG} className="size-5" alt="Contact" />
-              <span className="font-semibold text-[#9b87f5]">{user.email}</span>
+              <span className="font-semibold text-[#0067B3]">{user.email}</span>
             </span>
             <span className="text-sm text-gray-500 flex items-center gap-2">
               <img src={constants.PHONE_SVG} className="size-5" alt="Contact" />
-              <span className="font-semibold text-[#9b87f5]">{user.phone}</span>
+              <span className="font-semibold text-[#0067B3]">{user.phone}</span>
             </span>
           </div>
         </div>
@@ -74,13 +75,17 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
       </div>
 
       {/* button */}
-      <div className="border-t border-t-green-100 bg-gray-50 p-4">
-        <a
-          href={"/profile/" + user.name.toLowerCase().replace(/\s+/, "")}
-          className="block w-full rounded-lg bg-[#9b87f5] p-1 text-center text-white transition-all duration-300 hover:bg-purple-500"
+      <div className="border-t border-gray-100 bg-gray-50 py-2 flex justify-center">
+        <Button
+          style={{
+            width: '75%',
+          }}
+          variant='contained'
+          href={`/profile/${encodeURIComponent(user.name)}`}
+
         >
           View Profile
-        </a>
+        </Button>
       </div>
     </div>
   )

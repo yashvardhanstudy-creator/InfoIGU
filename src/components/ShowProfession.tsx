@@ -6,7 +6,6 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import * as React from "react";
-import { professionData } from './constants';
 
 
 export default function ShowProfession({
@@ -17,18 +16,11 @@ export default function ShowProfession({
   type: string;
   heading?: string;
   headingId?: string;
-  editMode?: boolean;
+  editMode: boolean;
 }) {
   const [loading, setLoading] = React.useState(!!name);
-  const [professions, setProfessions] = React.useState(professionData);
-  const [onEdit, setOnEdit] = React.useState(() => {
-    if (professions.length > 0) {
-      return Object.fromEntries(
-        professions.map((prof) => [prof.head, false]),
-      );
-    }
-    return {};
-  });
+  const [professions, setProfessions] = React.useState<any[]>([]);
+  const [onEdit, setOnEdit] = React.useState<{ [key: string]: boolean }>({});
 
   React.useEffect(() => {
     const fetchEducation = async () => {
@@ -39,12 +31,14 @@ export default function ShowProfession({
           throw new Error('Failed to fetch education data');
         }
         const fetchedData = await response.json();
-        setProfessions(fetchedData);
         if (fetchedData && fetchedData.length > 0) {
           setProfessions(fetchedData);
           setOnEdit(
-            Object.fromEntries(fetchedData.map((prof: any) => [prof.head, false]))
+            Object.fromEntries(fetchedData.map((prof: any) => [prof.id.toString(), false]))
           );
+        } else {
+          setProfessions([]);
+          setOnEdit({});
         }
       } catch (error) {
         console.error("Error:", error);
@@ -53,22 +47,35 @@ export default function ShowProfession({
       }
     };
 
-    if (name) {
+    if (id) {
       fetchEducation();
     }
-  }, [name]);
+  }, [id, type]);
+
+  const handleAdd = () => {
+    if (professions.some((prof) => prof.id.toString().startsWith("temp_"))) return;
+    const tempId = `temp_${Date.now()}`;
+    const newProfession = {
+      id: tempId,
+      head: "",
+      date_range: "",
+      type: type
+    };
+    setProfessions([newProfession, ...professions]);
+    setOnEdit((prev) => ({
+      ...prev,
+      [tempId]: true,
+    }));
+  };
 
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const professionToDelete = e.currentTarget.name;
+    const idToDelete = e.currentTarget.name;
     try {
-      const response = await fetch(`http://localhost:5000/api/education/${id}/${professionToDelete}`, {
+      const response = await fetch(`http://localhost:5000/api/education/${id}/${idToDelete}`, {
         method: "DELETE",
       });
       if (response.ok) {
-        const updatedProfessions = professions.filter(
-          (prof) => prof.head !== professionToDelete,
-        );
-        setProfessions(updatedProfessions);
+        setProfessions(professions.filter((prof) => prof.id.toString() !== idToDelete));
       }
     } catch (error) {
       console.error("Error deleting profession:", error);
@@ -76,49 +83,50 @@ export default function ShowProfession({
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const professionToEdit = e.currentTarget.name;
+    const idToEdit = e.currentTarget.name;
     setOnEdit((prev) => ({
       ...prev,
-      [professionToEdit]: true,
+      [idToEdit]: true,
     }));
   };
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    const professionToSave = e.currentTarget.name;
+    const idToSave = e.currentTarget.name;
     const inputElementProf = document.querySelector(
-      `input[name="${professionToSave}"]`,
+      `input[name="head_${idToSave}"]`,
     ) as HTMLInputElement | null;
     const inputElementDateRange = document.querySelector(
-      `input[name="${professionToSave}date"]`,
+      `input[name="date_range_${idToSave}"]`,
     ) as HTMLInputElement | null;
-    if (
-      inputElementProf &&
-      inputElementDateRange &&
-      (inputElementProf.value || inputElementDateRange.value)
-    ) {
+
+    const headValue = inputElementProf?.value || "";
+    const dateRangeValue = inputElementDateRange?.value || "";
+
+    if (headValue || dateRangeValue) {
       try {
-        const response = await fetch(`http://localhost:5000/api/education/${id}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+        const isNew = idToSave.startsWith("temp_");
+        const endpointUrl = isNew
+          ? `http://localhost:5000/api/education/${id}`
+          : `http://localhost:5000/api/education/${id}/${idToSave}`;
+        const method = isNew ? "POST" : "PUT";
+
+        const response = await fetch(endpointUrl, {
+          method,
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            name: name,
-            head: inputElementProf.value,
-            date_range: inputElementDateRange.value,
+            head: headValue,
+            date_range: dateRangeValue,
             type: type
           }),
         });
 
         if (response.ok) {
           const newProfession = await response.json();
-          const updatedProfessions = professions.map((prof) => {
-            if (prof.head === professionToSave) {
-              return { ...prof, id: newProfession.id, head: newProfession.head, date_range: newProfession.date_range };
-            }
-            return prof;
-          });
-          setProfessions(updatedProfessions);
+          setProfessions(professions.map((prof) =>
+            prof.id.toString() === idToSave ? newProfession : prof
+          ));
+          setOnEdit((prev) => ({ ...prev, [newProfession.id.toString()]: false, [idToSave]: false }));
+          return;
         }
       } catch (error) {
         console.error("Error saving profession:", error);
@@ -126,15 +134,18 @@ export default function ShowProfession({
     }
     setOnEdit((prev) => ({
       ...prev,
-      [professionToSave]: false,
+      [idToSave]: false,
     }));
   };
 
   const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const professionToCancel = e.currentTarget.name;
+    const idToCancel = e.currentTarget.name;
+    if (idToCancel.startsWith("temp_")) {
+      setProfessions(professions.filter((p) => p.id.toString() !== idToCancel));
+    }
     setOnEdit((prev) => ({
       ...prev,
-      [professionToCancel]: false,
+      [idToCancel]: false,
     }));
   };
 
@@ -153,27 +164,13 @@ export default function ShowProfession({
         <Table sx={{ minWidth: 650 }} aria-label="profession table">
           <TableBody>
             <TableRow>
-              <TableCell>Profession</TableCell>
+              <TableCell>{type === 'education' ? 'Education' : 'Profession'}</TableCell>
               <TableCell align="right">Date Range</TableCell>
               {editMode && (
                 <>
                   <TableCell align="right">
                     <Button
-                      onClick={() => {
-                        if (professions.find((prof) => prof.head === ""))
-                          return;
-                        const newProfession = {
-                          id: professions.length + 1,
-                          head: "",
-                          date_range: "",
-                          type: type
-                        };
-                        setProfessions([newProfession, ...professions]);
-                        setOnEdit((prev) => ({
-                          ...prev,
-                          [newProfession.head]: true,
-                        }));
-                      }}
+                      onClick={handleAdd}
                     >
                       Add
                     </Button>
@@ -182,66 +179,67 @@ export default function ShowProfession({
                 </>
               )}
             </TableRow>
-            {professions.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.head}
-                  {onEdit[row.head] && (
-                    <input
-                      className="border-b-2 focus:outline-none focus:border-blue-500"
-                      placeholder="profession"
-                      name={row.head}
-                      style={{ display: "block", marginTop: "0.5rem" }}
-                      required={true}
-                    />
+            {professions.map((row) => {
+              const rowId = row.id.toString();
+              const isEditing = onEdit[rowId];
+              return (
+                <TableRow
+                  key={rowId}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {isEditing ? (
+                      <input
+                        className="border-b-2 focus:outline-none focus:border-blue-500 w-full"
+                        placeholder={type === 'education' ? 'Education' : 'Profession'}
+                        name={`head_${rowId}`}
+                        defaultValue={row.head}
+                        required={true}
+                      />
+                    ) : row.head}
+                  </TableCell>
+                  <TableCell align="right">
+                    {isEditing ? (
+                      <input
+                        className="border-b-2 focus:outline-none focus:border-blue-500 w-full text-right"
+                        placeholder="Date Range"
+                        name={`date_range_${rowId}`}
+                        defaultValue={row.date_range}
+                      />
+                    ) : row.date_range}
+                  </TableCell>
+                  {editMode && (
+                    isEditing ? (
+                      <>
+                        <TableCell align="right">
+                          <Button onClick={handleSave} name={rowId}>
+                            Save
+                          </Button>
+                        </TableCell>
+                        <TableCell align="right" width={"2px"}>
+                          <Button onClick={handleCancel} name={rowId}>
+                            Cancel
+                          </Button>
+                        </TableCell>
+                      </>
+                    ) : (
+                      <>
+                        <TableCell align="right" width={"2px"}>
+                          <Button onClick={handleEdit} name={rowId}>
+                            Edit
+                          </Button>
+                        </TableCell>
+                        <TableCell align="right" width={"2px"}>
+                          <Button onClick={handleDelete} name={rowId}>
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </>
+                    )
                   )}
-                </TableCell>
-                <TableCell align="right">
-                  {row.date_range}
-                  {onEdit[row.head] && (
-                    <input
-                      className="border-b-2 place-self-end placeholder:place-self-end-safe focus:outline-none focus:border-blue-500"
-                      placeholder="date range"
-                      name={row.head + "date"}
-                      style={{ display: "block", marginTop: "0.5rem" }}
-                      required={true}
-                    />
-                  )}
-                </TableCell>
-                {editMode && (
-                  onEdit[row.head] ? (
-                    <>
-                      <TableCell align="right">
-                        <Button onClick={handleSave} name={row.head}>
-                          Save
-                        </Button>
-                      </TableCell>
-                      <TableCell align="right" width={"2px"}>
-                        <Button onClick={handleCancel} name={row.head}>
-                          Cancel
-                        </Button>
-                      </TableCell>
-                    </>
-                  ) : (
-                    <>
-                      <TableCell align="right" width={"2px"}>
-                        <Button onClick={handleEdit} name={row.head}>
-                          Edit
-                        </Button>
-                      </TableCell>
-                      <TableCell align="right" width={"2px"}>
-                        <Button onClick={handleDelete} name={row.head}>
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </>
-                  )
-                )}
-              </TableRow>
-            ))}
+                </TableRow>
+              )
+            })}
           </TableBody>
         </Table>
       </TableContainer>

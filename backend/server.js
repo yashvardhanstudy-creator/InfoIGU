@@ -142,12 +142,33 @@ app.get("/api/education/:id/:type", async (req, res) => {
 
 app.post("/api/education/:id", async (req, res) => {
   try {
+    const { head, date_range, type } = req.body;
+    if (type !== "education" && type !== "profession") {
+      return res
+        .status(400)
+        .json({ error: "Invalid type. Must be 'education' or 'profession'." });
+    }
+
     const result = await pool.query(
-      "INSERT INTO education (u_id, head, date_range) VALUES ($1, $2, $3) RETURNING *",
-      [req.params.id, req.body.head, req.body.date_range],
+      "INSERT INTO education (u_id, head, date_range, type) VALUES ($1, $2, $3, $4) RETURNING *",
+      [req.params.id, head, date_range, type],
     );
     // console.log(result);
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/education/:id/:record_id", async (req, res) => {
+  try {
+    const { head, date_range, type } = req.body;
+    const result = await pool.query(
+      "UPDATE education SET head = $1, date_range = $2, type = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [head, date_range, type, req.params.id, req.params.record_id],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.log(err.message);
     res.status(500).send("Server Error");
@@ -214,13 +235,12 @@ app.post("/api/research_interests/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/education/:id/:head", async (req, res) => {
+app.delete("/api/education/:id/:record_id", async (req, res) => {
   try {
     const result = await pool.query(
-      "DELETE FROM education WHERE u_id = $1 AND head = $2",
-      [req.params.id, req.params.head],
+      "DELETE FROM education WHERE u_id = $1 AND id = $2",
+      [req.params.id, req.params.record_id],
     );
-    // console.log(result);
     res.json(result.rows);
   } catch (err) {
     console.log(err.message);
@@ -250,6 +270,29 @@ app.post("/api/books/:id", async (req, res) => {
       [req.params.id, title, isbn, publish_date, edition, authors, url],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/books/:id/:bookId", async (req, res) => {
+  try {
+    const { title, isbn, publish_date, edition, authors, url } = req.body;
+    const result = await pool.query(
+      "UPDATE books SET title = $1, isbn = $2, publish_date = $3, edition = $4, authors = $5, url = $6 WHERE u_id = $7 AND id = $8 RETURNING *",
+      [
+        title,
+        isbn,
+        publish_date,
+        edition,
+        authors,
+        url,
+        req.params.id,
+        req.params.bookId,
+      ],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -290,6 +333,20 @@ app.post("/api/publications/:id", async (req, res) => {
       [req.params.id, title, publish_date, url],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/publications/:id/:publicationId", async (req, res) => {
+  try {
+    const { title, publish_date, url } = req.body;
+    const result = await pool.query(
+      "UPDATE publications SET title = $1, publish_date = $2, url = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [title, publish_date, url, req.params.id, req.params.publicationId],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -344,6 +401,30 @@ app.post("/api/patents/:id", async (req, res) => {
   }
 });
 
+app.put("/api/patents/:id/:patentId", async (req, res) => {
+  try {
+    const { title, status, patent_number, application_number, inventors, url } =
+      req.body;
+    const result = await pool.query(
+      "UPDATE patents SET title = $1, status = $2, inventors = $3, patent_number = $4, application_number = $5, url = $6 WHERE u_id = $7 AND id = $8 RETURNING *",
+      [
+        title,
+        status,
+        inventors,
+        patent_number,
+        application_number,
+        url,
+        req.params.id,
+        req.params.patentId,
+      ],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.delete("/api/patents/:id/:patentId", async (req, res) => {
   try {
     const result = await pool.query(
@@ -377,6 +458,20 @@ app.post("/api/honors/:id", async (req, res) => {
       [req.params.id, title, date_issued, description, url],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/honors/:id/:honorId", async (req, res) => {
+  try {
+    const { title, date_issued, description, url } = req.body;
+    const result = await pool.query(
+      "UPDATE honors SET title = $1, date_issued = $2, discription = $3, url = $4 WHERE u_id = $5 AND id = $6 RETURNING *",
+      [title, date_issued, description, url, req.params.id, req.params.honorId],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -440,6 +535,38 @@ app.post("/api/projects/:id", async (req, res) => {
   }
 });
 
+app.put("/api/projects/:id/:itemId", async (req, res) => {
+  try {
+    const {
+      topic,
+      start_date,
+      field,
+      financial_outlay,
+      funding_agency,
+      other_officers,
+      url,
+    } = req.body;
+    const result = await pool.query(
+      "UPDATE projects SET topic = $1, start_date = $2, field = $3, financial_outlay = $4, funding_agency = $5, other_officers = $6, url = $7 WHERE u_id = $8 AND id = $9 RETURNING *",
+      [
+        topic,
+        start_date,
+        field,
+        financial_outlay,
+        funding_agency,
+        other_officers,
+        url,
+        req.params.id,
+        req.params.itemId,
+      ],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.delete("/api/projects/:id/:itemId", async (req, res) => {
   try {
     const result = await pool.query(
@@ -469,12 +596,34 @@ app.get("/api/collaborations/:id", async (req, res) => {
 
 app.post("/api/collaborations/:id", async (req, res) => {
   try {
-    const { title, organization, date_range } = req.body;
+    const { title, organization, url, description, date_range } = req.body;
     const result = await pool.query(
-      "INSERT INTO collaborations (u_id, title, organization, date_range) VALUES ($1, $2, $3, $4) RETURNING *",
-      [req.params.id, title, organization, date_range],
+      "INSERT INTO collaborations (u_id, title, organization, url, description, date_range) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+      [req.params.id, title, organization, url, description, date_range],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/collaborations/:id/:itemId", async (req, res) => {
+  try {
+    const { title, organization, url, description, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE collaborations SET title = $1, organization = $2, url = $3, description = $4, date_range = $5 WHERE u_id = $6 AND id = $7 RETURNING *",
+      [
+        title,
+        organization,
+        url,
+        description,
+        date_range,
+        req.params.id,
+        req.params.itemId,
+      ],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -522,6 +671,20 @@ app.post("/api/memberships/:id", async (req, res) => {
   }
 });
 
+app.put("/api/memberships/:id/:itemId", async (req, res) => {
+  try {
+    const { organization, role, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE memberships SET organization = $1, role = $2, date_range = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [organization, role, date_range, req.params.id, req.params.itemId],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.delete("/api/memberships/:id/:itemId", async (req, res) => {
   try {
     const result = await pool.query(
@@ -557,6 +720,20 @@ app.post("/api/teaching_engagements/:id", async (req, res) => {
       [req.params.id, course_name, level, date_range],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/teaching_engagements/:id/:itemId", async (req, res) => {
+  try {
+    const { course_name, level, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE teaching_engagements SET course_name = $1, level = $2, date_range = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [course_name, level, date_range, req.params.id, req.params.itemId],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -604,6 +781,27 @@ app.post("/api/supervisions/:id", async (req, res) => {
   }
 });
 
+app.put("/api/supervisions/:id/:itemId", async (req, res) => {
+  try {
+    const { student_name, topic, status, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE supervisions SET student_name = $1, topic = $2, status = $3, date_range = $4 WHERE u_id = $5 AND id = $6 RETURNING *",
+      [
+        student_name,
+        topic,
+        status,
+        date_range,
+        req.params.id,
+        req.params.itemId,
+      ],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.delete("/api/supervisions/:id/:itemId", async (req, res) => {
   try {
     const result = await pool.query(
@@ -639,6 +837,20 @@ app.post("/api/associate_scholars/:id", async (req, res) => {
       [req.params.id, scholar_name, topic, date_range],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/associate_scholars/:id/:itemId", async (req, res) => {
+  try {
+    const { scholar_name, topic, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE associate_scholars SET scholar_name = $1, topic = $2, date_range = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [scholar_name, topic, date_range, req.params.id, req.params.itemId],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -685,6 +897,27 @@ app.post("/api/events/:id", async (req, res) => {
   }
 });
 
+app.put("/api/events/:id/:itemId", async (req, res) => {
+  try {
+    const { event_name, role, date_range, location } = req.body;
+    const result = await pool.query(
+      "UPDATE events SET event_name = $1, role = $2, date_range = $3, location = $4 WHERE u_id = $5 AND id = $6 RETURNING *",
+      [
+        event_name,
+        role,
+        date_range,
+        location,
+        req.params.id,
+        req.params.itemId,
+      ],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.delete("/api/events/:id/:itemId", async (req, res) => {
   try {
     const result = await pool.query(
@@ -719,6 +952,20 @@ app.post("/api/visits/:id", async (req, res) => {
       [req.params.id, location, purpose, date_range],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/visits/:id/:itemId", async (req, res) => {
+  try {
+    const { location, purpose, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE visits SET location = $1, purpose = $2, date_range = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [location, purpose, date_range, req.params.id, req.params.itemId],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
@@ -766,6 +1013,20 @@ app.post("/api/administrative_positions/:id", async (req, res) => {
   }
 });
 
+app.put("/api/administrative_positions/:id/:itemId", async (req, res) => {
+  try {
+    const { position, organization, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE administrative_positions SET position = $1, organization = $2, date_range = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [position, organization, date_range, req.params.id, req.params.itemId],
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 app.delete("/api/administrative_positions/:id/:itemId", async (req, res) => {
   try {
     const result = await pool.query(
@@ -801,6 +1062,20 @@ app.post("/api/miscellaneous/:id", async (req, res) => {
       [req.params.id, title, description, date_range],
     );
     res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.put("/api/miscellaneous/:id/:itemId", async (req, res) => {
+  try {
+    const { title, description, date_range } = req.body;
+    const result = await pool.query(
+      "UPDATE miscellaneous SET title = $1, description = $2, date_range = $3 WHERE u_id = $4 AND id = $5 RETURNING *",
+      [title, description, date_range, req.params.id, req.params.itemId],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

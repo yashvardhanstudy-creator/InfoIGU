@@ -88,12 +88,14 @@ export default function ShowGeneric({ id, endpoint, columns, heading, headingId,
         // Basic validation: Require at least the very first column to be filled
         if (payload[columns[0].key]) {
             try {
-                if (!rowToSave.startsWith("temp_")) {
-                    await fetch(`http://localhost:5000/api/${endpoint}/${id}/${rowToSave}`, { method: "DELETE" });
-                }
+                const isNew = rowToSave.startsWith("temp_");
+                const endpointUrl = isNew
+                    ? `http://localhost:5000/api/${endpoint}/${id}`
+                    : `http://localhost:5000/api/${endpoint}/${id}/${rowToSave}`;
+                const method = isNew ? "POST" : "PUT";
 
-                const response = await fetch(`http://localhost:5000/api/${endpoint}/${id}`, {
-                    method: "POST",
+                const response = await fetch(endpointUrl, {
+                    method,
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
                 });

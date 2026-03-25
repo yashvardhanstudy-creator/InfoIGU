@@ -102,14 +102,14 @@ export default function ShowPatents({ id, heading, headingId, editMode }: { id: 
 
         if (titleVal) {
             try {
-                if (!patToSave.startsWith("temp_")) {
-                    await fetch(`http://localhost:5000/api/patents/${id}/${patToSave}`, {
-                        method: "DELETE",
-                    });
-                }
+                const isNew = patToSave.startsWith("temp_");
+                const endpointUrl = isNew
+                    ? `http://localhost:5000/api/patents/${id}`
+                    : `http://localhost:5000/api/patents/${id}/${patToSave}`;
+                const method = isNew ? "POST" : "PUT";
 
-                const response = await fetch(`http://localhost:5000/api/patents/${id}`, {
-                    method: "POST",
+                const response = await fetch(endpointUrl, {
+                    method,
                     headers: {
                         "Content-Type": "application/json",
                     },

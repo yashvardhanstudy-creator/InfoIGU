@@ -3,19 +3,51 @@ import { Menu, X } from "lucide-react";
 
 const ProfileNav = () => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const vertical_list_nest =
-    document.getElementsByClassName("one-liner-captions");
 
-  const list_sub_heading = document.getElementsByClassName("sub-heading");
-  for (let i = 0; i < vertical_list_nest.length; i++) {
-    var id = vertical_list_nest[i].innerHTML.toLowerCase();
-    vertical_list_nest[i].setAttribute("id", id.replace(/\s/g, "") + "d");
-  }
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.getAttribute("id");
+            // Remove active class from all links
+            document.querySelectorAll('.one-liner-captions.active-list-item').forEach(item => {
+              item.classList.remove('active-list-item');
+            });
+            // Add active class to the corresponding link
+            const navLink = document.getElementById(`${id}d`);
+            if (navLink) {
+              navLink.classList.add('active-list-item');
+            }
+          }
+        });
+      },
+      {
+        // This creates a horizontal line 25% from the top of the viewport.
+        // When a section header crosses this line, it becomes active.
+        rootMargin: "-25% 0px -75% 0px",
+        threshold: 0,
+      }
+    );
 
-  for (let i = 0; i < list_sub_heading.length; i++) {
-    var id = list_sub_heading[i].innerHTML.toLowerCase();
-    list_sub_heading[i].setAttribute("id", id.replace(/\s/g, ""));
-  }
+    const sectionIds = [
+      "researchinterests", "educationaldetails", "professionalbackground",
+      "projects", "publications", "patents", "books", "collaborations",
+      "honors", "memberships", "teachingengagements", "supervisions",
+      "associatescholars", "events", "visits", "administrativepositions",
+      "miscellaneous",
+    ];
+
+    sectionIds.forEach((id) => {
+      const element = document.getElementById(id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    // Cleanup observer on component unmount
+    return () => observer.disconnect();
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   function head_click(id: any) {
     const element = document.getElementById(id);
@@ -43,17 +75,6 @@ const ProfileNav = () => {
     const target = document.getElementById(id);
     if (target) {
       target.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-
-    // Handle active class styling
-    const active_items = document.getElementsByClassName("active-list-item");
-    while (active_items.length > 0) {
-      active_items[0].classList.remove("active-list-item");
-    }
-
-    const navItem = document.getElementById(id + "d");
-    if (navItem) {
-      navItem.classList.add("active-list-item");
     }
 
     setIsOpen(false); // Close sidebar on mobile after selection
@@ -94,6 +115,7 @@ const ProfileNav = () => {
           <div className="w-full p-2 text-black hide-scrollbar min-h-20 rounded-2xl cursor-pointer">
             <div
               className="vertical-list-head ui sub-heading"
+              id="researchinterests-head"
               style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
               onClick={() => handleContentClick("researchinterests")}
             >
@@ -102,9 +124,9 @@ const ProfileNav = () => {
             <hr />
             <div
               className="vertical-list-head ui sub-heading"
-              id="biosketch"
+              id="biosketch-head"
               style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
-              onClick={() => handleHeadClick("biosketch")}
+              onClick={() => handleHeadClick("biosketch-head")}
             >
               Biosketch
             </div>
@@ -130,9 +152,9 @@ const ProfileNav = () => {
             <hr />
             <div
               className="ui one-liner-captions vertical-list-head sub-heading"
-              id="research"
+              id="research-head"
               style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
-              onClick={() => handleHeadClick("research")}
+              onClick={() => handleHeadClick("research-head")}
             >
               Research
             </div>
@@ -179,9 +201,9 @@ const ProfileNav = () => {
             <hr />
             <div
               className="vertical-list-head ui sub-heading"
-              id="honoursandawards"
+              id="honoursandawards-head"
               style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
-              onClick={() => handleHeadClick("honoursandawards")}
+              onClick={() => handleHeadClick("honoursandawards-head")}
             >
               Honours and Awards
             </div>
@@ -207,9 +229,9 @@ const ProfileNav = () => {
             <hr />
             <div
               className="vertical-list-head ui sub-heading"
-              id="teachingengagements"
+              id="teachingengagements-head"
               style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
-              onClick={() => handleHeadClick("teachingengagements")}
+              onClick={() => handleHeadClick("teachingengagements-head")}
             >
               Teaching Engagements
             </div>
@@ -228,9 +250,9 @@ const ProfileNav = () => {
             <hr />
             <div
               className="vertical-list-head ui sub-heading"
-              id="students"
+              id="students-head"
               style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
-              onClick={() => handleHeadClick("students")}
+              onClick={() => handleHeadClick("students-head")}
             >
               Students
             </div>
@@ -256,9 +278,9 @@ const ProfileNav = () => {
             <hr />
             <div
               className="vertical-list-head ui sub-heading"
-              id="miscellaneous"
+              id="miscellaneous-head"
               style={{ fontSize: "20px", color: "blue", padding: "0.35rem" }}
-              onClick={() => handleHeadClick("miscellaneous")}
+              onClick={() => handleHeadClick("miscellaneous-head")}
             >
               Miscellaneous
             </div>
