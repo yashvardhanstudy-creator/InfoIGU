@@ -6,7 +6,7 @@ import UserProfile from '../components/UserProfile';
 const Auth = () => {
     const navigate = useNavigate();
     // Simulating a session check. In a real app, this would come from a Context or Redux
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(!!UserProfile.getName());
     const [isLoginView, setIsLoginView] = useState(true);
     const [formData, setFormData] = useState({
         name: '',
@@ -74,7 +74,11 @@ const Auth = () => {
                     <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
                     <p className="mb-6 text-gray-600">You are currently logged into your session.</p>
                     <button
-                        onClick={() => setIsLoggedIn(false)}
+                        onClick={() => {
+                            UserProfile.setName('');
+                            UserProfile.setRole(false);
+                            setIsLoggedIn(false);
+                        }}
                         className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
                     >
                         Logout

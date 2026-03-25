@@ -5,11 +5,11 @@ import ProfileNav from "../components/ProfileNav3";
 import ProfileResume from "../components/ProfileResume";
 import UserProfile from "../components/UserProfile";
 
-const Profile = () => {
+const Profile = ({ editMode }: { editMode: boolean }) => {
   const { name: urlName } = useParams();
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(editMode);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,6 +54,7 @@ const Profile = () => {
         <ProfileNav />
 
         <ProfileResume
+          researchInterests={userData.research_interests}
           name={urlName}
           id={userData.id}
           editMode={isEditMode}

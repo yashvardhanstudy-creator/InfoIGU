@@ -1,21 +1,68 @@
+import * as React from "react";
 import ShowResearch from "./ShowResearch";
 import ShowPublication from "./ShowPublication";
 import ShowBooks from "./ShowBooks";
 import ShowPatents from "./ShowPatents";
 import ShowGeneric from "./ShowGeneric";
 import ShowProfession from "./ShowProfession";
+import Button from "@mui/material/Button";
 
 const ProfileResume = (props: any) => {
   const titleStyleh2 = "text-2xl text-[#0067B3] mt-2 mb-4 has-[+h2]:hidden last:hidden";
-  console.log(props);
+
+  const [isEditingRI, setIsEditingRI] = React.useState(false);
+  const [researchInterests, setResearchInterests] = React.useState(props.researchInterests || "");
+
+  React.useEffect(() => {
+    setResearchInterests(props.researchInterests || "");
+  }, [props.researchInterests]);
+
+  const handleSaveRI = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/research_interests/${props.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ research_interests: researchInterests }),
+      });
+      if (response.ok) {
+        setIsEditingRI(false);
+      }
+    } catch (error) {
+      console.error("Error saving research interests:", error);
+    }
+  };
+
   return (
     <div className="sm:w-full w-auto bg-[#f0f0f0] p-2 hide-scrollbar min-h-20 rounded-2xl overflow-y-auto ">
       <>
         <h2 className={titleStyleh2} id="researchinterests">
           RESEARCH INTERESTS
         </h2>
-        {props.researchInterests && (
-          <p>{props.researchInterests}</p>
+        {(props.editMode || researchInterests) && (
+          <div className="mb-6">
+            {isEditingRI ? (
+              <div className="flex flex-col gap-2">
+                <textarea
+                  className="w-full p-2 border-b-2 focus:outline-none focus:border-blue-500 rounded bg-transparent"
+                  rows={4}
+                  value={researchInterests}
+                  onChange={(e) => setResearchInterests(e.target.value)}
+                  placeholder="Enter your research interests..."
+                />
+                <div className="flex justify-end gap-2">
+                  <Button onClick={handleSaveRI}>Save</Button>
+                  <Button onClick={() => { setResearchInterests(props.researchInterests || ""); setIsEditingRI(false); }}>Cancel</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="group relative">
+                <p className="whitespace-pre-wrap">{researchInterests}</p>
+                {props.editMode && (
+                  <Button className="mt-2" variant="outlined" size="small" onClick={() => setIsEditingRI(true)}>Edit</Button>
+                )}
+              </div>
+            )}
+          </div>
         )}
       </>
       <>

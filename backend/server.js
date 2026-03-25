@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path");
 const app = express();
 const multer = require("multer");
+const nodemailer = require("nodemailer");
 
 const port = process.env.SERVER_PORT || 5000;
 
@@ -22,6 +23,16 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 console.log(__dirname);
 app.use("/", express.static(path.join(__dirname, "public")));
+
+// Nodemailer transporter setup
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "public"));
@@ -87,6 +98,29 @@ app.post("/api/login", async (req, res) => {
     }
   } catch (err) {
     console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.post("/api/send-email", async (req, res) => {
+  const { department, userEmail, subject, message } = req.body;
+  try {
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER, // To send to the department instead, you can map 'department' to an email address here
+      replyTo: userEmail,
+      subject: `[Contact Form - ${department.toUpperCase()}] ${subject}`,
+      text: `You have received a new query from: ${userEmail}\n\nMessage:\n${message}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`[Contact Form] Email successfully sent! Subject: ${subject}`);
+
+    res
+      .status(200)
+      .json({ success: true, message: "Query received successfully" });
+  } catch (err) {
+    console.error("Error sending email:", err.message);
     res.status(500).send("Server Error");
   }
 });
@@ -160,6 +194,20 @@ app.post("/api/update", upload.single("image"), async (req, res) => {
     const result = await pool.query(query, values);
     // console.log(result);
     res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+app.post("/api/research_interests/:id", async (req, res) => {
+  try {
+    const { research_interests } = req.body;
+    const result = await pool.query(
+      "UPDATE users SET research_interests = $1 WHERE id = $2 RETURNING *",
+      [research_interests, req.params.id],
+    );
+    res.json(result.rows[0]);
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");

@@ -1,23 +1,27 @@
 var UserProfile = (function () {
-    var full_name = "";
-    var admin = false;
+    var full_name = localStorage.getItem("user_name") || "";
+    var admin = localStorage.getItem("user_admin") === "true";
 
     var getName = function () {
-        return full_name;    // Or pull this from cookie/localStorage
+        return full_name;
     };
 
     var getRole = function () {
-        return admin;    // Or pull this from cookie/localStorage
+        return admin;
     };
 
     var setRole = function (role: boolean) {
         admin = role;
-        // Also set this in cookie/localStorage
+        localStorage.setItem("user_admin", String(role));
     };
 
     var setName = function (name: string) {
         full_name = name;
-        // Also set this in cookie/localStorage
+        if (name) {
+            localStorage.setItem("user_name", name);
+        } else {
+            localStorage.removeItem("user_name");
+        }
     };
 
     return {

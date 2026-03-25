@@ -10,7 +10,7 @@ export const routes = {
 export interface UserProfile {
   id: number
   name: string
-  researchInterest: string
+  research_interests: string
   work: string
   avatar: string
   email: string
@@ -69,7 +69,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
 
         {/* description */}
         <p title="hello" className="mb-4 line-clamp-3 text-gray-600">
-          {"lorem"}
+          {user.research_interests}
         </p>
       </div>
 

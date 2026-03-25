@@ -53,7 +53,7 @@ const Profile = () => {
         <ProfileNav />
 
         <ProfileResume
-          researchInterests={"userData.research_interests"}
+          researchInterests={userData.research_interests}
           name={urlName}
           id={userData.id}
           editMode={false}
