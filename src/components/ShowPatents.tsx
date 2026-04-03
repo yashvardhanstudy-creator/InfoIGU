@@ -37,7 +37,7 @@ export default function ShowPatents({ id, heading, headingId, editMode }: { id: 
                     throw new Error("Failed to fetch patents data");
                 }
                 const fetchedData = await response.json();
-                console.log(fetchedData);
+                // console.log(fetchedData);
                 if (fetchedData && fetchedData.length > 0) {
                     setPatents(fetchedData);
                     setOnEdit(

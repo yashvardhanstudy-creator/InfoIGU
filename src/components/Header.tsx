@@ -8,6 +8,7 @@ import * as constants from "../components/constants";
 const Header = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(!!UserProfile.getName());
+  const [isAdmin, setIsAdmin] = useState(UserProfile.getRole());
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -18,6 +19,7 @@ const Header = () => {
     UserProfile.setName("");
     UserProfile.setRole(false);
     setIsLoggedIn(false);
+    setIsAdmin(false);
     navigate("/");
   };
   const handleChangePassword = async () => {
@@ -53,7 +55,8 @@ const Header = () => {
     <header className="bg-gray-800 text-white p-4 flex sm:flex-row flex-col items-center justify-between">
       <nav>
 
-        <ul className="flex space-x-4">
+        <ul className="flex space-x-4 justify-center items-center">
+          <li><img src="/img/logo.png" alt="IGU" className="h-20 w-auto" /></li>
           <li><a href="/" className="hover:text-yellow-300">Indira Gandhi University</a></li>
         </ul>
       </nav>
@@ -70,7 +73,7 @@ const Header = () => {
         }}
           onClick={() => { navigate(isLoggedIn ? '/edit' : '/auth'); }}
         >
-          Edit Profile
+          {isLoggedIn ? 'Edit Profile' : 'Login'}
         </Button>
         <Button
           onClick={() => navigate('/contact')}
@@ -86,6 +89,22 @@ const Header = () => {
         >
           Contact Us
         </Button>
+        {isLoggedIn && isAdmin && (
+          <Button
+            onClick={() => navigate(UserProfile.getName()?.toLowerCase() === 'dev' ? '/dev' : '/admin')}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#17a2b8',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold'
+            }}
+          >
+            {UserProfile.getName()?.toLowerCase() === 'dev' ? 'Dev Dashboard' : 'Admin Dashboard'}
+          </Button>
+        )}
         {isLoggedIn && (
           <Button
             onClick={() => setIsChangePasswordOpen(true)}

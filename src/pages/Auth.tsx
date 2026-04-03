@@ -17,12 +17,17 @@ const Auth = () => {
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (formData.name == 'dev') {
-            UserProfile.setRole(true);
+        const value = e.target.value;
+        if (e.target.name === 'name') {
+            if (value.toLowerCase() === 'dev' || value.toLowerCase() === 'admin') {
+                UserProfile.setRole(true);
+            } else {
+                UserProfile.setRole(false);
+            }
         }
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]: value
         });
     };
 
@@ -48,14 +53,19 @@ const Auth = () => {
                 if (isLoginView) {
                     if (data.success) {
                         UserProfile.setName(data.user.name);
+                        if (data.user.name.toLowerCase() === 'admin' || data.user.name.toLowerCase() === 'dev') {
+                            UserProfile.setRole(true);
+                        } else {
+                            UserProfile.setRole(false);
+                        }
                         setIsLoggedIn(true);
-                        console.log('Login successful:', data.user);
+                        // console.log('Login successful:', data.user);
                         navigate('/');
                     } else {
                         setError(data.message || 'Login failed');
                     }
                 } else {
-                    console.log('Registration successful:', data);
+                    // console.log('Registration successful:', data);
                     setIsLoginView(true); // Switch to login after successful registration
                     alert('Registration successful! Please login.');
                 }
@@ -139,7 +149,7 @@ const Auth = () => {
                     </button>
                 </form>
 
-                {UserProfile.getRole() &&
+                {/* {UserProfile.getRole() &&
                     <div className="mt-6 text-center">
                         <p className="text-sm text-gray-600">
                             {isLoginView ? "Don't have an account?" : "Already have an account?"}
@@ -151,7 +161,7 @@ const Auth = () => {
                             </button>
                         </p>
                     </div>
-                }
+                } */}
 
 
                 <div className="mt-4 text-center">

@@ -217,6 +217,51 @@ app.post("/api/admin/table-data", async (req, res) => {
   }
 });
 
+// Admin delete user endpoint
+app.delete("/api/admin/users/:id", async (req, res) => {
+  const { adminName } = req.body;
+  if (adminName !== "admin") {
+    return res
+      .status(403)
+      .json({ success: false, error: "Unauthorized access." });
+  }
+
+  const tablesToClear = [
+    "education",
+    "books",
+    "publications",
+    "patents",
+    "honors",
+    "projects",
+    "collaborations",
+    "memberships",
+    "teaching_engagements",
+    "supervisions",
+    "associate_scholars",
+    "events",
+    "visits",
+    "administrative_positions",
+    "miscellaneous",
+  ];
+
+  try {
+    // Delete associated records first to avoid foreign key constraint violations
+    for (const table of tablesToClear) {
+      if (table === "users") {
+        await pool.query("DELETE FROM users WHERE id = $1", [req.params.id]);
+        continue;
+      }
+      await pool.query(`DELETE FROM ${table} WHERE u_id = $1`, [req.params.id]);
+    }
+    // Finally, delete the user
+    await pool.query("DELETE FROM users WHERE id = $1", [req.params.id]);
+    res.json({ success: true, message: "User deleted successfully" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.post("/api/send-email", async (req, res) => {
   const { department, userEmail, subject, message } = req.body;
   try {

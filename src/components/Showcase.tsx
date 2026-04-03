@@ -32,7 +32,7 @@ const Showcase = (props: any) => {
 
     fetchProfileData();
   }, []);
-  console.log(Profile);
+  // console.log(Profile);
   if (loading) return <div>Loading...</div>
 
   if (props.type === 'department') {

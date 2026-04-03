@@ -13,6 +13,12 @@ const AdminDashboard = () => {
     const [error, setError] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+    const [newUserName, setNewUserName] = useState('');
+    const [newUserPassword, setNewUserPassword] = useState('');
+    const [addUserMessage, setAddUserMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
+    const [deleteUserMessage, setDeleteUserMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null);
 
     const validTables = [
         "users", "education", "books", "publications", "patents", "honors",
@@ -57,7 +63,7 @@ const AdminDashboard = () => {
             }
         };
         fetchTableData();
-    }, [selectedTable]);
+    }, [selectedTable, refreshTrigger]);
 
     const filteredData = tableData.filter(row => {
         // 1. Global Text Filter
@@ -130,6 +136,70 @@ const AdminDashboard = () => {
         URL.revokeObjectURL(url);
     };
 
+    const handleCreateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setAddUserMessage(null);
+        try {
+            const response = await fetch(`${constants.SERVER_URL}api/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newUserName, password: newUserPassword })
+            });
+
+            if (response.ok) {
+                setAddUserMessage({ type: 'success', text: `User "${newUserName}" created successfully!` });
+                setNewUserName('');
+                setNewUserPassword('');
+
+                // Refresh the table if we are currently viewing the 'users' table
+                if (selectedTable === 'users') {
+                    setRefreshTrigger(prev => prev + 1);
+                }
+
+                setTimeout(() => {
+                    setIsAddUserModalOpen(false);
+                    setAddUserMessage(null);
+                }, 1500);
+            } else {
+                setAddUserMessage({ type: 'error', text: 'Failed to create user. The username might already exist.' });
+            }
+        } catch (err: any) {
+            setAddUserMessage({ type: 'error', text: 'Network error: ' + err.message });
+        }
+    };
+
+    const handleDeleteUser = async (userId: number, userName: string) => {
+        // Protect the core system accounts from being accidentally deleted
+        if (userName.toLowerCase() === 'admin' || userName.toLowerCase() === 'dev') {
+            setDeleteUserMessage({ type: 'error', text: `Cannot delete system account: ${userName}` });
+            setTimeout(() => setDeleteUserMessage(null), 3000);
+            return;
+        }
+
+        if (!window.confirm(`Are you sure you want to delete the user "${userName}"? All their associated data will also be deleted. This action cannot be undone.`)) {
+            return;
+        }
+
+        setDeleteUserMessage(null);
+        try {
+            const response = await fetch(`${constants.SERVER_URL}api/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminName: UserProfile.getName() })
+            });
+            const data = await response.json();
+            if (data.success) {
+                setDeleteUserMessage({ type: 'success', text: `User "${userName}" has been deleted.` });
+                setRefreshTrigger(prev => prev + 1);
+                setTimeout(() => setDeleteUserMessage(null), 3000);
+            } else {
+                setDeleteUserMessage({ type: 'error', text: data.error || 'Failed to delete user.' });
+            }
+        } catch (err: any) {
+            setDeleteUserMessage({ type: 'error', text: 'Network error: ' + err.message });
+        }
+    };
+
     if (UserProfile.getName() !== 'admin') {
         return <div className="p-8 text-center text-red-500 font-bold">Unauthorized</div>;
     }
@@ -139,7 +209,10 @@ const AdminDashboard = () => {
             <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-6">
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold text-[#1A365D]">Admin Dashboard</h1>
-                    <button onClick={() => navigate('/')} className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 font-semibold transition-colors">Go Back</button>
+                    <div className="flex gap-4">
+                        <button onClick={() => setIsAddUserModalOpen(true)} className="bg-[#1A365D] text-white px-4 py-2 rounded hover:bg-blue-800 font-semibold transition-colors shadow-sm">Add New User</button>
+                        <button onClick={() => navigate('/')} className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 font-semibold transition-colors">Go Back</button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
@@ -176,6 +249,12 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
+                {deleteUserMessage && (
+                    <div className={`mb-4 p-4 border rounded-md font-semibold ${deleteUserMessage.type === 'error' ? 'bg-red-100 text-red-700 border-red-300' : 'bg-green-100 text-green-700 border-green-300'}`}>
+                        {deleteUserMessage.text}
+                    </div>
+                )}
+
                 {error && <div className="mb-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-md font-semibold">{error}</div>}
 
                 <div className="flex justify-between items-center mb-3">
@@ -199,16 +278,31 @@ const AdminDashboard = () => {
                                     {tableData.length > 0 ? Object.keys(tableData[0]).map((key) => (
                                         <th key={key} className="px-4 py-3 text-left font-bold text-white uppercase tracking-wider">{key.replace('_', ' ')}</th>
                                     )) : <th className="px-4 py-3 text-left text-white">No columns found</th>}
+                                    {selectedTable === 'users' && tableData.length > 0 && (
+                                        <th className="px-4 py-3 text-right font-bold text-white uppercase tracking-wider">Actions</th>
+                                    )}
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {paginatedData.length > 0 ? paginatedData.map((row, i) => (
                                     <tr key={i} className="hover:bg-blue-50 transition-colors">
                                         {Object.values(row).map((val: any, j) => (
-                                            <td key={j} className="px-4 py-3 whitespace-nowrap text-gray-800">
-                                                {val !== null && val !== undefined ? String(val) : <span className="text-gray-400 italic">null</span>}
+                                            <td key={j} className="px-4 py-3 text-gray-800">
+                                                <div className="max-w-62.5 truncate" title={val !== null && val !== undefined ? String(val) : undefined}>
+                                                    {val !== null && val !== undefined ? String(val) : <span className="text-gray-400 italic">null</span>}
+                                                </div>
                                             </td>
                                         ))}
+                                        {selectedTable === 'users' && (
+                                            <td className="px-4 py-3 whitespace-nowrap text-right">
+                                                <button
+                                                    onClick={() => handleDeleteUser(row.id, row.name)}
+                                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition text-xs font-bold shadow-sm"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
+                                        )}
                                     </tr>
                                 )) : (
                                     <tr>
@@ -249,6 +343,50 @@ const AdminDashboard = () => {
                     </div>
                 )}
             </div>
+
+            {/* Add User Modal */}
+            {isAddUserModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <h2 className="text-2xl font-bold text-[#1A365D] mb-4">Add New User</h2>
+                        {addUserMessage && (
+                            <div className={`mb-4 p-3 rounded-md font-semibold text-sm ${addUserMessage.type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                {addUserMessage.text}
+                            </div>
+                        )}
+                        <form onSubmit={handleCreateUser} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Full Name (Username)</label>
+                                <input
+                                    type="text"
+                                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                                    value={newUserName}
+                                    onChange={(e) => setNewUserName(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Temporary Password</label>
+                                <input
+                                    type="password"
+                                    className="w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500"
+                                    value={newUserPassword}
+                                    onChange={(e) => setNewUserPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="flex justify-end gap-3 mt-6">
+                                <button type="button" onClick={() => { setIsAddUserModalOpen(false); setAddUserMessage(null); }} className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 font-semibold transition-colors">
+                                    Cancel
+                                </button>
+                                <button type="submit" className="px-4 py-2 bg-[#1A365D] text-white rounded hover:bg-blue-800 font-semibold transition-colors shadow-sm">
+                                    Create User
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

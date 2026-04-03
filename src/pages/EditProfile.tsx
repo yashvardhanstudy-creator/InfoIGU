@@ -24,7 +24,7 @@ const Profile = ({ editMode }: { editMode: boolean }) => {
       try {
         const response = await fetch(`${constants.SERVER_URL}api/profiles/profile/${name}`);
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         if (data && data.length > 0) {
           setUserData(data[0]);
         }
