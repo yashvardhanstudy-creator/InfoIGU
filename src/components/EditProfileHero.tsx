@@ -101,7 +101,7 @@ const EditProfile = (props: any) => {
       formData.append("image", imageFile);
     }
 
-    fetch("http://localhost:5000/api/update", {
+    fetch(`${constants.SERVER_URL}api/update`, {
       method: "POST",
       body: formData,
     })

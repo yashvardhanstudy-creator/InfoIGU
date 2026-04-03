@@ -4,6 +4,7 @@ import EditProfileHero from "../components/EditProfileHero";
 import ProfileNav from "../components/ProfileNav3";
 import ProfileResume from "../components/ProfileResume";
 import UserProfile from "../components/UserProfile";
+import * as constants from "../components/constants";
 
 const Profile = ({ editMode }: { editMode: boolean }) => {
   const { name: urlName } = useParams();
@@ -21,7 +22,7 @@ const Profile = ({ editMode }: { editMode: boolean }) => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5000/api/profiles/profile/${name}`);
+        const response = await fetch(`${constants.SERVER_URL}api/profiles/profile/${name}`);
         const data = await response.json();
         console.log(data);
         if (data && data.length > 0) {

@@ -6,6 +6,7 @@ import ShowPatents from "./ShowPatents";
 import ShowGeneric from "./ShowGeneric";
 import ShowProfession from "./ShowProfession";
 import Button from "@mui/material/Button";
+import * as constants from "./constants";
 
 const ProfileResume = (props: any) => {
   const titleStyleh2 = "text-xl font-bold text-[#1A365D] mt-8 mb-4 border-b-2 border-gray-200 pb-2 uppercase tracking-wide has-[+h2]:hidden last:hidden";
@@ -19,7 +20,7 @@ const ProfileResume = (props: any) => {
 
   const handleSaveRI = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/research_interests/${props.id}`, {
+      const response = await fetch(`${constants.SERVER_URL}api/research_interests/${props.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ research_interests: researchInterests }),

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserProfile from '../components/UserProfile';
+import * as constants from '../components/constants';
 
 
 const Auth = () => {
@@ -29,8 +30,8 @@ const Auth = () => {
         e.preventDefault();
         setError('');
 
-        const endpoint = isLoginView ? '/api/login' : '/api/register';
-        const url = `http://localhost:5000${endpoint}`;
+        const endpoint = isLoginView ? 'api/login' : 'api/register';
+        const url = `${constants.SERVER_URL}${endpoint}`;
 
         try {
             const response = await fetch(url, {
@@ -49,7 +50,7 @@ const Auth = () => {
                         UserProfile.setName(data.user.name);
                         setIsLoggedIn(true);
                         console.log('Login successful:', data.user);
-                        navigate('/edit');
+                        navigate('/');
                     } else {
                         setError(data.message || 'Login failed');
                     }
@@ -93,9 +94,14 @@ const Auth = () => {
     return (
         <div className="flex items-center justify-center min-h-screen bg-[#1A365D]">
             <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-                <h2 className="text-2xl font-bold text-center text-[#1A365D] mb-8">
+                <h2 className="text-2xl font-bold text-center text-[#1A365D] mb-4">
                     {isLoginView ? 'Login to IGU' : 'Register for IGU'}
                 </h2>
+
+                <div className="mb-6 text-sm text-gray-700 bg-blue-50 p-4 rounded-md border border-blue-100">
+                    <p className="mb-1"><em>Your username is the exact name of your profile.</em></p>
+                    <p>If you forgot your password, please contact the <em>UCC</em>.</p>
+                </div>
 
                 {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
 

@@ -8,6 +8,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import * as React from "react";
+import * as constants from "./constants";
 
 interface Book {
     id: string | number;
@@ -29,7 +30,7 @@ export default function ShowBooks({ id, heading, headingId, editMode }: { id: nu
         const fetchBooks = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`http://localhost:5000/api/books/${id}`);
+                const response = await fetch(`${constants.SERVER_URL}api/books/${id}`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch books data");
                 }
@@ -58,7 +59,7 @@ export default function ShowBooks({ id, heading, headingId, editMode }: { id: nu
         const bookIdToDelete = e.currentTarget.name;
         try {
             const response = await fetch(
-                `http://localhost:5000/api/books/${id}/${bookIdToDelete}`,
+                `${constants.SERVER_URL}api/books/${id}/${bookIdToDelete}`,
                 {
                     method: "DELETE",
                 }
@@ -97,8 +98,8 @@ export default function ShowBooks({ id, heading, headingId, editMode }: { id: nu
             try {
                 const isNew = bookToSave.startsWith("temp_");
                 const endpointUrl = isNew
-                    ? `http://localhost:5000/api/books/${id}`
-                    : `http://localhost:5000/api/books/${id}/${bookToSave}`;
+                    ? `${constants.SERVER_URL}api/books/${id}`
+                    : `${constants.SERVER_URL}api/books/${id}/${bookToSave}`;
                 const method = isNew ? "POST" : "PUT";
 
                 const response = await fetch(endpointUrl, {

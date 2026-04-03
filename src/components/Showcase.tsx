@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import DepartmentCard from './DepartmentCard'
 import ProfileCard from './ProfileCard'
+import * as constants from './constants'
 
 
 const Showcase = (props: any) => {
@@ -14,10 +15,13 @@ const Showcase = (props: any) => {
 
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/api/show/`);
+        const response = await fetch(`${constants.SERVER_URL}api/show/`);
         const data = await response.json();
         if (data && data.length > 0) {
-          setProfile(data);
+          const filteredProfiles = data.filter((user: any) =>
+            user.name?.toLowerCase() !== 'dev' && user.name?.toLowerCase() !== 'admin'
+          );
+          setProfile(filteredProfiles);
         }
       } catch (error) {
         console.error("Error fetching profile data:", error);

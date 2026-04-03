@@ -9,6 +9,8 @@ import Auth from "./pages/Auth";
 import Contact from "./pages/Contact";
 import UserProfile from "./components/UserProfile";
 import ResumePrint from "./pages/ResumePrint";
+import DevSQL from "./pages/DevSQL";
+import AdminDashboard from "./pages/AdminDashboard";
 
 const NotFound = () => (
   <div className="flex flex-col items-center justify-center h-screen bg-gray-100 text-[#1A365D]">
@@ -40,6 +42,8 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/dev" element={<DevSQL />} />
+      <Route path="/admin" element={<AdminDashboard />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/resume/:name" element={<ResumePrint />} />
       <Route path="/auth" element={<Auth />} />

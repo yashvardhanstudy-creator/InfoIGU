@@ -8,6 +8,7 @@ import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import * as React from "react";
 import Tooltip from "@mui/material/Tooltip";
+import * as constants from "./constants";
 
 
 
@@ -38,7 +39,7 @@ export default function ShowGeneric({ id, endpoint, columns, heading, headingId,
         const fetchData = async () => {
             setLoading(true);
             try {
-                const response = await fetch(`http://localhost:5000/api/${endpoint}/${id}`);
+                const response = await fetch(`${constants.SERVER_URL}api/${endpoint}/${id}`);
                 if (!response.ok) throw new Error(`Failed to fetch ${endpoint} data`);
                 const fetchedData = await response.json();
                 console.log(fetchedData);
@@ -90,8 +91,8 @@ export default function ShowGeneric({ id, endpoint, columns, heading, headingId,
             try {
                 const isNew = rowToSave.startsWith("temp_");
                 const endpointUrl = isNew
-                    ? `http://localhost:5000/api/${endpoint}/${id}`
-                    : `http://localhost:5000/api/${endpoint}/${id}/${rowToSave}`;
+                    ? `${constants.SERVER_URL}api/${endpoint}/${id}`
+                    : `${constants.SERVER_URL}api/${endpoint}/${id}/${rowToSave}`;
                 const method = isNew ? "POST" : "PUT";
 
                 const response = await fetch(endpointUrl, {
@@ -125,7 +126,7 @@ export default function ShowGeneric({ id, endpoint, columns, heading, headingId,
     const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
         const rowToDelete = e.currentTarget.name;
         try {
-            const response = await fetch(`http://localhost:5000/api/${endpoint}/${id}/${rowToDelete}`, { method: "DELETE" });
+            const response = await fetch(`${constants.SERVER_URL}api/${endpoint}/${id}/${rowToDelete}`, { method: "DELETE" });
             if (response.ok) setData((prev) => prev.filter((item) => item.id.toString() !== rowToDelete));
         } catch (error) {
             console.error(`Error deleting ${endpoint}:`, error);

@@ -13,6 +13,7 @@ import { Box, IconButton, TableFooter, TablePagination } from "@mui/material";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
 import FirstPageIcon from '@mui/icons-material/FirstPage';
 import LastPageIcon from '@mui/icons-material/LastPage';
+import * as constants from "./constants";
 
 interface TablePaginationActionsProps {
   count: number;
@@ -99,7 +100,7 @@ export default function ShowPublication({ id, heading, headingId, editMode, isPr
     const fetchPublications = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/publications/${id}`);
+        const response = await fetch(`${constants.SERVER_URL}api/publications/${id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch publications data");
         }
@@ -173,8 +174,8 @@ export default function ShowPublication({ id, heading, headingId, editMode, isPr
       try {
         const isNew = pubToSave.startsWith("temp_");
         const endpointUrl = isNew
-          ? `http://localhost:5000/api/publications/${id}`
-          : `http://localhost:5000/api/publications/${id}/${pubToSave}`;
+          ? `${constants.SERVER_URL}api/publications/${id}`
+          : `${constants.SERVER_URL}api/publications/${id}/${pubToSave}`;
         const method = isNew ? "POST" : "PUT";
 
         const response = await fetch(endpointUrl, {
@@ -225,7 +226,7 @@ export default function ShowPublication({ id, heading, headingId, editMode, isPr
     const pubToDelete = e.currentTarget.name;
     try {
       const response = await fetch(
-        `http://localhost:5000/api/publications/${id}/${pubToDelete}`,
+        `${constants.SERVER_URL}api/publications/${id}/${pubToDelete}`,
         { method: "DELETE" }
       );
       if (response.ok) {

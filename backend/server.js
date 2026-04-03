@@ -19,7 +19,33 @@ const pool = new Pool({
 });
 
 app.use(express.json());
-app.use(cors());
+
+// Configure CORS for production security
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+
+    // Allow requests with no origin (like mobile apps or curl) or explicitly allowed origin
+    if (
+      !origin ||
+      origin === allowedOrigin ||
+      origin === "http://localhost:5173"
+    ) {
+      return callback(null, true);
+    }
+
+    // Dynamically allow any local network IP (e.g., http://192.168.x.x:port)
+    if (/^http:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+
+    callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 console.log(__dirname);
 app.use("/", express.static(path.join(__dirname, "public")));
@@ -99,6 +125,95 @@ app.post("/api/login", async (req, res) => {
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server Error");
+  }
+});
+
+// Change Password endpoint
+app.post("/api/change-password", async (req, res) => {
+  const { name, oldPassword, newPassword } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE users SET password = $1 WHERE name = $2 AND password = $3 RETURNING *",
+      [newPassword, name, oldPassword],
+    );
+    if (result.rows.length > 0) {
+      res.json({ success: true, message: "Password updated successfully" });
+    } else {
+      res
+        .status(401)
+        .json({ success: false, message: "Incorrect current password" });
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Execute arbitrary SQL (Dev only)
+app.post("/api/execute-sql", async (req, res) => {
+  const { name, query } = req.body;
+  if (name !== "dev") {
+    return res
+      .status(403)
+      .json({ success: false, error: "Unauthorized access." });
+  }
+  try {
+    const result = await pool.query(query);
+    res.json({
+      success: true,
+      rows: result.rows,
+      command: result.command,
+      rowCount: result.rowCount,
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// Admin table data endpoint
+app.post("/api/admin/table-data", async (req, res) => {
+  const { name, table } = req.body;
+  if (name !== "admin") {
+    return res
+      .status(403)
+      .json({ success: false, error: "Unauthorized access." });
+  }
+
+  const validTables = [
+    "users",
+    "education",
+    "books",
+    "publications",
+    "patents",
+    "honors",
+    "projects",
+    "collaborations",
+    "memberships",
+    "teaching_engagements",
+    "supervisions",
+    "associate_scholars",
+    "events",
+    "visits",
+    "administrative_positions",
+    "miscellaneous",
+  ];
+
+  if (!validTables.includes(table)) {
+    return res.status(400).json({ success: false, error: "Invalid table." });
+  }
+
+  try {
+    let queryStr = `SELECT * FROM ${table}`;
+    // For all tables except 'users', join the users table to fetch the user's name
+    if (table !== "users") {
+      queryStr = `SELECT u.name AS user_name, t.* FROM ${table} t LEFT JOIN users u ON t.u_id = u.id`;
+    }
+    const result = await pool.query(queryStr);
+    res.json({ success: true, data: result.rows });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 

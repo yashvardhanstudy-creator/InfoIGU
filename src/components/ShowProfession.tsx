@@ -6,6 +6,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import * as React from "react";
+import * as constants from "./constants";
 
 
 export default function ShowProfession({
@@ -26,7 +27,7 @@ export default function ShowProfession({
     const fetchEducation = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/education/${id}/${type}`);
+        const response = await fetch(`${constants.SERVER_URL}api/education/${id}/${type}`);
         if (!response.ok) {
           throw new Error('Failed to fetch education data');
         }
@@ -71,7 +72,7 @@ export default function ShowProfession({
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const idToDelete = e.currentTarget.name;
     try {
-      const response = await fetch(`http://localhost:5000/api/education/${id}/${idToDelete}`, {
+      const response = await fetch(`${constants.SERVER_URL}api/education/${id}/${idToDelete}`, {
         method: "DELETE",
       });
       if (response.ok) {
@@ -106,8 +107,8 @@ export default function ShowProfession({
       try {
         const isNew = idToSave.startsWith("temp_");
         const endpointUrl = isNew
-          ? `http://localhost:5000/api/education/${id}`
-          : `http://localhost:5000/api/education/${id}/${idToSave}`;
+          ? `${constants.SERVER_URL}api/education/${id}`
+          : `${constants.SERVER_URL}api/education/${id}/${idToSave}`;
         const method = isNew ? "POST" : "PUT";
 
         const response = await fetch(endpointUrl, {

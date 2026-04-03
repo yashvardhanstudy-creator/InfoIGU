@@ -12,7 +12,7 @@ const ResumePrint = () => {
         const fetchProfileData = async () => {
             if (!name) return;
             try {
-                const response = await fetch(`http://localhost:5000/api/profiles/profile/${name}`);
+                const response = await fetch(`${constants.SERVER_URL}api/profiles/profile/${name}`);
                 const data = await response.json();
                 if (data && data.length > 0) {
                     setUserData(data[0]);
