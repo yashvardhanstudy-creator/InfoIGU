@@ -42,7 +42,7 @@ export default function ShowGeneric({ id, endpoint, columns, heading, headingId,
                 const response = await fetch(`${constants.SERVER_URL}api/${endpoint}/${id}`);
                 if (!response.ok) throw new Error(`Failed to fetch ${endpoint} data`);
                 const fetchedData = await response.json();
-                console.log(fetchedData);
+                // console.log(fetchedData);
                 if (fetchedData && fetchedData.length > 0) {
                     setData(fetchedData);
                     setOnEdit(Object.fromEntries(fetchedData.map((item: any) => [item.id.toString(), false])));

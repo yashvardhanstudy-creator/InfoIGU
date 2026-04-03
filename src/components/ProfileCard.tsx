@@ -25,7 +25,7 @@ type ProfileCardProps = {
 
 const ProfileCard = ({ user }: ProfileCardProps) => {
 
-  console.log(user);
+  // console.log(user);
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
 
@@ -38,7 +38,7 @@ const ProfileCard = ({ user }: ProfileCardProps) => {
           <div className="w-fill max-w-28 h-auto">
             <img
               src={`${constants.SERVER_URL}${user.name}_${user.department}.png`}
-              onError={(e) => { e.currentTarget.src = constants.PROFILE_PIC_URL; }}
+              onError={(e) => { e.currentTarget.src = 'img/default.png'; }}
               alt={user.name}
               className="size-32 md:size-24 lg:size-32 rounded-full object-cover"
             />

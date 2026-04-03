@@ -112,7 +112,7 @@ const EditProfile = (props: any) => {
         return response.json();
       })
 
-    console.log("Saving changes:", profileData);
+    // console.log("Saving changes:", profileData);
     setIsEditing(false);
 
   };
