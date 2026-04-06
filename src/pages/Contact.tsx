@@ -6,6 +6,7 @@ const Contact = () => {
     department: "",
     userEmail: "",
     subject: "",
+    contact: "",
     message: "",
   });
   const [status, setStatus] = useState("");
@@ -37,6 +38,7 @@ const Contact = () => {
           department: "",
           userEmail: "",
           subject: "",
+          contact: "",
           message: "",
         }); // Reset form
       } else {
@@ -84,10 +86,8 @@ const Contact = () => {
               <option value="" disabled>
                 Select a department...
               </option>
-              <option value="support">Customer Support</option>
-              <option value="hr">Human Resources</option>
-              <option value="it">IT Helpdesk</option>
-              <option value="sales">Sales</option>
+              <option value="2203.btech@igu.ac.in">UCC</option>
+              <option value="naveen.cse@igu.ac.in">UCC Assistant Director</option>
             </select>
           </div>
 
@@ -96,7 +96,7 @@ const Contact = () => {
               htmlFor="userEmail"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Your Email:
+              Email:
             </label>
             <input
               type="email"
@@ -108,7 +108,23 @@ const Contact = () => {
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
-
+          <div>
+            <label
+              htmlFor="contact"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Phone Number:
+            </label>
+            <input
+              type="tel"
+              id="contact"
+              name="contact"
+              value={formData.contact}
+              onChange={handleChange}
+              required
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
           <div>
             <label
               htmlFor="subject"

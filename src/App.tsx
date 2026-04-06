@@ -1,6 +1,5 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import "./App.css";
-// import Departments from './pages/Departments'
 import Department from "./pages/Department";
 import EditProfile from "./pages/EditProfile";
 import Contact from "./pages/Contact";

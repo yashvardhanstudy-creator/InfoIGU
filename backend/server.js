@@ -1,13 +1,13 @@
-require("dotenv").config();
 const express = require("express");
 const { Pool } = require("pg");
 const cors = require("cors");
 const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 const app = express();
 const multer = require("multer");
 const nodemailer = require("nodemailer");
 
-const port = process.env.SERVER_PORT || 5000;
+const port = process.env.SERVER_PORT;
 
 // PostgreSQL connection pool
 const pool = new Pool({
@@ -55,7 +55,7 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASSWORD,
   },
 });
 
@@ -263,14 +263,30 @@ app.delete("/api/admin/users/:id", async (req, res) => {
 });
 
 app.post("/api/send-email", async (req, res) => {
-  const { department, userEmail, subject, message } = req.body;
+  const { department, userEmail, subject, contact, message } = req.body;
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: process.env.EMAIL_USER, // To send to the department instead, you can map 'department' to an email address here
+      to: department,
       replyTo: userEmail,
       subject: `[Contact Form - ${department.toUpperCase()}] ${subject}`,
-      text: `You have received a new query from: ${userEmail}\n\nMessage:\n${message}`,
+      text: `You have received a new query from: ${userEmail}\n\nPhone: ${contact}\nMessage:\n${message}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; padding: 20px;">
+          <h2 style="color: #1A365D; border-bottom: 2px solid #1A365D; padding-bottom: 10px; margin-top: 0;">New Contact Query</h2>
+          <p style="margin: 5px 0;"><strong>From:</strong> <a href="mailto:${userEmail}">${userEmail}</a></p>
+          <p style="margin: 5px 0;"><strong>Phone:</strong> ${contact || "Not provided"}</p>
+          <p style="margin: 5px 0;"><strong>Target Department:</strong> ${department.toUpperCase()}</p>
+          
+          <h3 style="margin-top: 20px; margin-bottom: 10px; color: #1A365D;">Message:</h3>
+          <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #1A365D; border-radius: 4px; white-space: pre-wrap; font-size: 15px;">${message}</div>
+          
+          <hr style="border: 0; border-top: 1px solid #eee; margin: 30px 0 15px;" />
+          <p style="margin: 0; font-size: 12px; color: #777; text-align: center;">
+            This email was generated automatically from the InfoIGU Contact Form.
+          </p>
+        </div>
+      `,
     };
 
     await transporter.sendMail(mailOptions);
