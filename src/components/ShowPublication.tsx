@@ -133,6 +133,7 @@ export default function ShowPublication({ id, heading, headingId, editMode, isPr
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number,
   ) => {
+    console.log(event);
     setPage(newPage);
   };
 

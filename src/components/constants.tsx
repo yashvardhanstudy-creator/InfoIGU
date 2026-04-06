@@ -10,6 +10,5 @@ export const DEPARTMENT_SVG =
 export const DEPARTMENT_SVG_WHITE =
   "https://cmsredesign.channeli.in/library/assets/icons/location.svg";
 
-const isProd = import.meta.env?.PROD;
-export const SERVER_URL = isProd ? "/" : `http://${window.location.hostname}:5000/`;
+export const SERVER_URL = `http://${window.location.hostname}:3003/`;
 export const PROFILE_PIC_URL = SERVER_URL + "default.png";

@@ -8,7 +8,7 @@ const Showcase = (props: any) => {
   const [Profile, setProfile] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [Card, setCard] = useState([]); // Do Not Remove
+  const [Card, _setCard] = useState([]); // Do Not Remove
 
   useEffect(() => {
     const fetchProfileData = async () => {
