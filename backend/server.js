@@ -267,7 +267,7 @@ app.post("/api/send-email", async (req, res) => {
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER,
-      to: department,
+      to: [department, "naveen.cse@igu.ac.in"],
       replyTo: userEmail,
       subject: `[Contact Form - ${department.toUpperCase()}] ${subject}`,
       text: `You have received a new query from: ${userEmail}\n\nPhone: ${contact}\nMessage:\n${message}`,

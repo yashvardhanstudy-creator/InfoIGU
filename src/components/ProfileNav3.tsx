@@ -93,6 +93,7 @@ const ProfileNav = () => {
       <>
         {/* Mobile Toggle Button */}
         <button
+          name="toggle navigation"
           className="lg:hidden fixed bottom-4 right-4 z-50 bg-[#1A365D] text-white p-3 rounded-full shadow-xl"
           onClick={() => setIsOpen(!isOpen)}
         >

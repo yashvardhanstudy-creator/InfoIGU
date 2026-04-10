@@ -81,7 +81,7 @@ const Auth = () => {
     if (isLoggedIn) {
         return (
             <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-                <div className="p-8 bg-white shadow-md rounded-lg text-center">
+                <main className="p-8 bg-white shadow-md rounded-lg text-center">
                     <h2 className="text-2xl font-bold mb-4">Welcome Back!</h2>
                     <p className="mb-6 text-gray-600">You are currently logged into your session.</p>
                     <button
@@ -96,14 +96,14 @@ const Auth = () => {
                     >
                         Logout
                     </button>
-                </div>
+                </main>
             </div>
         );
     }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-[#1A365D]">
-            <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
+            <main className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
                 <h2 className="text-2xl font-bold text-center text-[#1A365D] mb-4">
                     {isLoginView ? 'Login to IGU' : 'Register for IGU'}
                 </h2>
@@ -149,19 +149,6 @@ const Auth = () => {
                     </button>
                 </form>
 
-                {/* {UserProfile.getRole() &&
-                    <div className="mt-6 text-center">
-                        <p className="text-sm text-gray-600">
-                            {isLoginView ? "Don't have an account?" : "Already have an account?"}
-                            <button
-                                onClick={() => setIsLoginView(!isLoginView)}
-                                className="ml-2 text-blue-600 font-semibold hover:underline"
-                            >
-                                {isLoginView ? 'Register here' : 'Login here'}
-                            </button>
-                        </p>
-                    </div>
-                } */}
 
 
                 <div className="mt-4 text-center">
@@ -169,7 +156,7 @@ const Auth = () => {
                         &larr; Back to Home
                     </a>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

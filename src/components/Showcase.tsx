@@ -46,11 +46,11 @@ const Showcase = (props: any) => {
   } else {
     return (
       <>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+        <main className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
           {Profile.map((user: any) => (
             <ProfileCard key={user.id} user={user} />
           ))}
-        </div>
+        </main>
       </>
     )
   }

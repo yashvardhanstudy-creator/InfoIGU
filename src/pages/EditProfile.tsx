@@ -51,7 +51,7 @@ const Profile = ({ editMode }: { editMode: boolean }) => {
         &larr; Go Back
       </button>
       <EditProfileHero data={userData} editMode={isEditMode} setEditMode={setIsEditMode} isEdit={true} />
-      <div className="MuiBox-root flex overflow-hidden h-lvh lg:m-auto sm:m-0 lg:w-4/5 sm:w-full justify-around">
+      <main className="MuiBox-root flex overflow-hidden h-lvh lg:m-auto sm:m-0 lg:w-4/5 sm:w-full justify-around">
         <ProfileNav />
 
         <ProfileResume
@@ -61,7 +61,7 @@ const Profile = ({ editMode }: { editMode: boolean }) => {
           editMode={isEditMode}
 
         />
-      </div>
+      </main>
     </>
   );
 };
